@@ -1,0 +1,4 @@
+docker info
+docker compose up -d --build
+docker compose logs -f api-gateway
+docker compose down

@@ -1,0 +1,21 @@
+services:
+
+  # 1. The Eureka Server
+  eureka-server:
+    build: ./backend/eurekaserver
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    # env_file: 
+    #   - ./backend/eurekaserver/.env
+
+  # 2. The API Gateway
+  api-gateway:
+    build: ./backend/apigateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eureka-server
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/

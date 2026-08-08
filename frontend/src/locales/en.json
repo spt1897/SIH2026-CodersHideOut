@@ -1,0 +1,10 @@
+{
+  "navbar": {
+    "title": "Dashboard",
+    "login": "Login"
+  },
+  "dashboard": {
+    "welcome": "System Online. Welcome back.",
+    "uploadPrompt": "Upload image for analysis"
+  }
+}

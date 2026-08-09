@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome — Sign In or Create an Account</title>
+
+  <!-- Type pairing: Sora for display/brand, Inter for body/UI text -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Ambient animated background. Purely decorative, hidden from screen readers. -->
+  <div class="aurora" aria-hidden="true">
+    <span class="aurora__blob aurora__blob--one"></span>
+    <span class="aurora__blob aurora__blob--two"></span>
+    <span class="aurora__blob aurora__blob--three"></span>
+    <span class="aurora__grid"></span>
+  </div>
+
+  <main class="page">
+    <div class="auth-card" id="authCard">
+
+      <!-- Brand mark + language selector. This dropdown is purely
+           visual for now — it doesn't translate any text or talk to
+           a backend. It just lets the user pick a language, which
+           you can read from #languageSelect.value whenever you're
+           ready to wire it up. -->
+      <div class="brand">
+        <span class="brand__mark" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L21 7V17L12 22L3 17V7L12 2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+            <path d="M12 2V22M3 7L12 12L21 7M3 17L12 12L21 17" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" opacity="0.55"/>
+          </svg>
+        </span>
+        <span class="brand__name">Coder's Hideoout</span>
+
+        <label class="lang-select" for="languageSelect">
+          <span class="sr-only">Language</span>
+          <select id="languageSelect">
+            <option value="en" selected>English</option>
+            <option value="hi">हिन्दी</option>
+            <option value="mara">मराठी</option>
+            <option value="punjabi">ਪੰਜਾਬੀ</option>
+            <option value="bangali">বাংলা</option>
+            <option value="telugu">తెలుగు</option>
+            <option value="tamil">தமிழ்</option>
+            <option value="malyalam">വിവരങ്ങൾ</option>
+            <option value="gujrati">ગુજરાતી</option>
+            <option value="abc">abc</option>
+            <option value="pqr">pqr</option>
+            <option value="klm">klm</option>
+            <option value="efg">efg</option>
+          </select>
+        </label>
+      </div>
+
+      <!-- Tab toggle: switches between Log In and Sign Up -->
+      <div class="tabs" role="tablist" aria-label="Authentication mode">
+        <button type="button" class="tabs__btn is-active" id="tabLogin" role="tab" aria-selected="true" aria-controls="loginPanel">Log In</button>
+        <button type="button" class="tabs__btn" id="tabSignup" role="tab" aria-selected="false" aria-controls="signupPanel">Sign Up</button>
+        <span class="tabs__indicator" id="tabIndicator" aria-hidden="true"></span>
+      </div>
+
+      <!-- Sliding viewport that holds both forms + the forgot-password panel -->
+      <div class="viewport" id="viewport">
+        <div class="track" id="track">
+
+          <!-- ============ LOG IN PANEL ============ -->
+          <section class="panel" id="loginPanel" role="tabpanel" aria-labelledby="tabLogin">
+            <form id="loginForm" class="form" novalidate>
+              <h1 class="form__title">Welcome back</h1>
+              <p class="form__subtitle">Log in to pick up right where you left off.</p>
+
+              <!-- Username or Email -->
+              <div class="field">
+                <label for="loginIdentifier">Username or email</label>
+                <div class="input-shell">
+                  <input
+                    type="text"
+                    id="loginIdentifier"
+                    name="identifier"
+                    autocomplete="username"
+                    placeholder="xyz_123 or xyz@email.com"
+                    required
+                  />
+                </div>
+                <p class="field__error" id="loginIdentifierError" role="alert"></p>
+              </div>
+
+              <!-- Password -->
+              <div class="field">
+                <label for="loginPassword">Password</label>
+                <div class="input-shell">
+                  <input
+                    type="password"
+                    id="loginPassword"
+                    name="password"
+                    autocomplete="current-password"
+                    placeholder="Enter your password"
+                    required
+                  />
+                  <button type="button" class="eye-toggle" data-target="loginPassword" aria-label="Show password" aria-pressed="false">
+                    <svg class="eye-open" width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/></svg>
+                    <svg class="eye-closed" width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" hidden><path d="M3 3l18 18M10.6 10.7a3 3 0 0 0 4.2 4.2M9.4 5.4A11 11 0 0 1 12 5c7 0 11 7 11 7a13.5 13.5 0 0 1-3.6 4.3M6.3 6.9C3.7 8.6 2 11 2 11a13.7 13.7 0 0 0 4.6 5.1A11 11 0 0 0 12 18c1 0 2-.15 2.9-.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                </div>
+                <p class="field__error" id="loginPasswordError" role="alert"></p>
+              </div>
+
+              <!-- Remember me + Forgot password -->
+              <div class="form__row">
+                <label class="checkbox">
+                  <input type="checkbox" id="rememberMe" name="rememberMe" />
+                  <span class="checkbox__box" aria-hidden="true"></span>
+                  <span>Remember me</span>
+                </label>
+                <button type="button" class="link-btn" id="forgotPasswordBtn">Forgot password?</button>
+              </div>
+
+              <button type="submit" class="submit-btn" id="loginSubmit">
+                <span class="submit-btn__label">Log In</span>
+                <span class="submit-btn__spinner" aria-hidden="true"></span>
+              </button>
+
+              <p class="form__switch">
+                <span>Don't have an account?</span>
+                <button type="button" class="link-btn link-btn--accent" data-goto="signup">Create one</button>
+              </p>
+            </form>
+          </section>
+
+          <!-- ============ SIGN UP PANEL ============ -->
+          <section class="panel" id="signupPanel" role="tabpanel" aria-labelledby="tabSignup">
+            <form id="signupForm" class="form" novalidate>
+              <h1 class="form__title">Create your account</h1>
+              <p class="form__subtitle">Takes less than a minute. No credit card needed.</p>
+
+              <!-- Username -->
+              <div class="field">
+                <label for="signupUsername">Username</label>
+                <div class="input-shell">
+                  <input
+                    type="text"
+                    id="signupUsername"
+                    name="username"
+                    autocomplete="username"
+                    placeholder="Choose a username"
+                    required
+                  />
+                </div>
+                <p class="field__hint">3–20 characters. Start with a letter — letters, numbers, and underscores only.</p>
+                <p class="field__error" id="signupUsernameError" role="alert"></p>
+              </div>
+
+              <!-- Email -->
+              <div class="field">
+                <label for="signupEmail">Email address</label>
+                <div class="input-shell">
+                  <input
+                    type="email"
+                    id="signupEmail"
+                    name="email"
+                    autocomplete="email"
+                    placeholder="you@email.com"
+                    required
+                  />
+                </div>
+                <p class="field__error" id="signupEmailError" role="alert"></p>
+              </div>
+
+              <!-- Password -->
+              <div class="field">
+                <label for="signupPassword">Password</label>
+                <div class="input-shell">
+                  <input
+                    type="password"
+                    id="signupPassword"
+                    name="password"
+                    autocomplete="new-password"
+                    placeholder="Create a password"
+                    required
+                  />
+                  <button type="button" class="eye-toggle" data-target="signupPassword" aria-label="Show password" aria-pressed="false">
+                    <svg class="eye-open" width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/></svg>
+                    <svg class="eye-closed" width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" hidden><path d="M3 3l18 18M10.6 10.7a3 3 0 0 0 4.2 4.2M9.4 5.4A11 11 0 0 1 12 5c7 0 11 7 11 7a13.5 13.5 0 0 1-3.6 4.3M6.3 6.9C3.7 8.6 2 11 2 11a13.7 13.7 0 0 0 4.6 5.1A11 11 0 0 0 12 18c1 0 2-.15 2.9-.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                </div>
+
+                <!-- Password strength meter -->
+                <div class="strength" id="strengthMeter" aria-hidden="true">
+                  <span class="strength__bar"><i></i></span>
+                  <span class="strength__bar"><i></i></span>
+                  <span class="strength__bar"><i></i></span>
+                </div>
+                <p class="strength__label" id="strengthLabel"></p>
+
+                <p class="field__error" id="signupPasswordError" role="alert"></p>
+              </div>
+
+              <!-- Confirm Password -->
+              <div class="field">
+                <label for="signupConfirmPassword">Confirm password</label>
+                <div class="input-shell">
+                  <input
+                    type="password"
+                    id="signupConfirmPassword"
+                    name="confirmPassword"
+                    autocomplete="new-password"
+                    placeholder="Re-enter your password"
+                    required
+                  />
+                  <button type="button" class="eye-toggle" data-target="signupConfirmPassword" aria-label="Show password" aria-pressed="false">
+                    <svg class="eye-open" width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/></svg>
+                    <svg class="eye-closed" width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" hidden><path d="M3 3l18 18M10.6 10.7a3 3 0 0 0 4.2 4.2M9.4 5.4A11 11 0 0 1 12 5c7 0 11 7 11 7a13.5 13.5 0 0 1-3.6 4.3M6.3 6.9C3.7 8.6 2 11 2 11a13.7 13.7 0 0 0 4.6 5.1A11 11 0 0 0 12 18c1 0 2-.15 2.9-.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                </div>
+                <p class="field__error" id="signupConfirmPasswordError" role="alert"></p>
+              </div>
+
+              <button type="submit" class="submit-btn" id="signupSubmit">
+                <span class="submit-btn__label">Create Account</span>
+                <span class="submit-btn__spinner" aria-hidden="true"></span>
+              </button>
+
+              <p class="form__switch">
+                <span>Already have an account?</span>
+                <button type="button" class="link-btn link-btn--accent" data-goto="login">Log in</button>
+              </p>
+            </form>
+          </section>
+
+          <!-- ============ FORGOT PASSWORD PANEL ============ -->
+          <section class="panel" id="forgotPanel" role="tabpanel" aria-labelledby="forgotPasswordBtn">
+            <form id="forgotForm" class="form" novalidate>
+              <h1 class="form__title">Reset your password</h1>
+              <p class="form__subtitle">Enter your email and we'll send a reset link.</p>
+
+              <div class="field">
+                <label for="forgotEmail">Email address</label>
+                <div class="input-shell">
+                  <input
+                    type="email"
+                    id="forgotEmail"
+                    name="forgotEmail"
+                    autocomplete="email"
+                    placeholder="you@email.com"
+                    required
+                  />
+                </div>
+                <p class="field__error" id="forgotEmailError" role="alert"></p>
+              </div>
+
+              <button type="submit" class="submit-btn" id="forgotSubmit">
+                <span class="submit-btn__label">Send Reset Link</span>
+                <span class="submit-btn__spinner" aria-hidden="true"></span>
+              </button>
+
+              <p class="form__switch">
+                <button type="button" class="link-btn link-btn--accent" data-goto="login">← Back to log in</button>
+              </p>
+            </form>
+          </section>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Toast notification for success / info messages -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>

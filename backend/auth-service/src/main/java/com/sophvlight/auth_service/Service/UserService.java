@@ -70,7 +70,7 @@ public class UserService implements UserDetailsService {
     }
 
     private TokenDTO generateToken(String username, int id,String role) {
-        String accessToken = jwtService.generateToken(username);
+        String accessToken = jwtService.generateToken(username,id,role);
         String refreshToken = rtService.generateToken(username);
         db2.save(new RefreshToken(id, refreshToken));
         return new TokenDTO(accessToken, refreshToken,role);

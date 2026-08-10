@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -27,6 +28,13 @@ public class UserController {
     @Autowired
     public UserController(UserService service){
         this.service=service;
+    }
+    @GetMapping("/secure-test")
+    public ResponseEntity<String> testSecureRoute(@RequestHeader(value = "X-Auth-Username", required = false) String username) {
+        if (username == null) {
+            return ResponseEntity.badRequest().body("Gateway failed to inject username header!");
+        }
+        return ResponseEntity.ok("Success! The API Gateway validated the token for user: " + username);
     }
     @PostMapping("/register")
     public ResponseEntity<TokenDTO> registerUser(@AuthenticationPrincipal UserData details, @RequestBody Users user) throws GeneralException{

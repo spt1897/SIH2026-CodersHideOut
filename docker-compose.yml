@@ -25,6 +25,8 @@ services:
     depends_on:
       eureka-server:
         condition: service_started
+    env_file:                           
+      - ./backend/auth-service/.env
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
       - SERVER_PORT=8181

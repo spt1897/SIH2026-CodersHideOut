@@ -18,3 +18,9 @@ eureka:
     fetch-registry: true
   instance:
     prefer-ip-address: true
+
+software:
+  jwt:
+    access:
+      secret: ${JWT_ACCESS_SECRET}
+      life: ${JWT_ACCESS_LIFE}

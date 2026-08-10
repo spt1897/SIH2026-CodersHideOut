@@ -23,8 +23,10 @@ public class JWTService {
     private String secretKey;
     @Value("${software.jwt.access.life}")
     private long accessTokenLife;
-    public String generateToken(String username){
+    public String generateToken(String username,int userId,String role){
         Map<String,Object> claims = new HashMap<>();
+        claims.put("userId", userId);
+        claims.put("role", role);
         return Jwts
                     .builder()
                     .claims()

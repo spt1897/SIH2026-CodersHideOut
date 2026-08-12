@@ -29,7 +29,7 @@ async def ReceiveFileInStorage(file:UploadFile, content_type_patterns:list[str],
         try:
             chunk_size = 1024*1024 if not chunk_size else chunk_size
             size =0 
-            async with aiofiles.open(file_path, "wb") as out_file:
+            async with aiofiles.open(file_path, "ab") as out_file:
                 while chunk := await file.read(chunk_size):
                     await out_file.write(chunk)
                     size += len(chunk)

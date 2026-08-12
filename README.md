@@ -9,8 +9,8 @@
 5) Handles file receiving/uploading via formdata/ws in memory or file storage.  
 6) Verifies JWT token for requests.  
 7) Seperate process pool for cpu extensive tasks without blocking event loop.  
+8) Notification sender via sms, email, voiccalls.  
 
 **This core/ can be added to any microservice and it shall be setup , we can focus only on the service itself.**  
   
-**Just copy the core/ folder to src/ folder of the microservice and requirements.txt to root folder of the microservice with the services main requirements.txt.
-Then simply create main.py in src/ and start using the core/ to instant setup the server.**
+**Just copy the branch to the microservice-folder/ in backend/ , change readme accordingly, and append to requirements.txt whatever new libs are being used. Setup for microservice is done. Then start writing the functionalities of the service in src/ in respective folders.**

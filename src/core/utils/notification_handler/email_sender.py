@@ -5,13 +5,12 @@ from src.core.config import Config
 from src.core.exceptions.mid_service_exceptions.email_send_exception import EmailSendException
 import asyncio
 
-async def send_email(address_to:str, address_from:str,
-                     subject:str, email_body:str,app: FastAPI):
+async def send_email(address_to:str,subject:str, email_body:str,app: FastAPI):
     
     config :Config= app.state.config
     delay  = config.retry_delay_init
     email =EmailMessage()
-    email["From"] = address_from
+    email["From"] = config.smtp_address_from
     email["To"] =address_to
     email["Subject"] = subject
     email.set_content(email_body)

@@ -1,0 +1,21 @@
+#web frameworks
+fastapi==0.141.1
+uvicorn[standard]==0.52.1
+
+#http request sender
+httpx==0.28.1
+
+#DB connectors
+asyncpg==0.31.0
+redis==7.4.0
+
+#Eureka service registration client
+py-eureka-client==0.13.3
+
+#jwt verifier
+pyjwt==2.13.0
+
+#others
+pydantic==2.13.4
+python-dotenv==1.2.2
+aiofiles==25.1.0

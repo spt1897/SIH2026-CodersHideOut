@@ -13,4 +13,4 @@
 
 **This core/ can be added to any microservice and it shall be setup , we can focus only on the service itself.**  
   
-**Just copy the branch to the microservice-folder/ in backend/ , change readme accordingly, and append to requirements.txt whatever new libs are being used. Setup for microservice is done. Then start writing the functionalities of the service in src/ in respective folders.**
+**Just copy the branch to the microservice-folder/ in backend/ , change readme accordingly, and append to requirements.txt whatever new libs are being used. Setup for microservice is done. Then start writing the functionalities of the service in src/ in respective folders. Change src/core/config.py accordingly if you need any other config vars. Have a .env file as shown.**

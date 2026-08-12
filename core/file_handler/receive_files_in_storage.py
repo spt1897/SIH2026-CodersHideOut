@@ -27,6 +27,7 @@ async def ReceiveFileInStorage(file:UploadFile, content_type_patterns:list[str],
             )
         
         try:
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
             chunk_size = 1024*1024 if not chunk_size else chunk_size
             size =0 
             async with aiofiles.open(file_path, "ab") as out_file:

@@ -5,6 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Welcome — Sign In or Create an Account</title>
 
+  <!-- Set the theme before first paint so there's no flash of the
+       wrong theme. Reads a saved choice from localStorage, falling
+       back to the user's OS-level light/dark preference. -->
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('theme');
+        var theme = stored || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+
   <!-- Type pairing: Sora for display/brand, Inter for body/UI text -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -25,11 +40,11 @@
   <main class="page">
     <div class="auth-card" id="authCard">
 
-      <!-- Brand mark + language selector. This dropdown is purely
-           visual for now — it doesn't translate any text or talk to
-           a backend. It just lets the user pick a language, which
-           you can read from #languageSelect.value whenever you're
-           ready to wire it up. -->
+      <!-- Brand mark + theme toggle + language selector. The language
+           dropdown is purely visual for now — it doesn't translate any
+           text or talk to a backend. It just lets the user pick a
+           language, which you can read from #languageSelect.value
+           whenever you're ready to wire it up. -->
       <div class="brand">
         <span class="brand__mark" aria-hidden="true">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -39,24 +54,46 @@
         </span>
         <span class="brand__name">Coder's Hideoout</span>
 
-        <label class="lang-select" for="languageSelect">
-          <span class="sr-only">Language</span>
-          <select id="languageSelect">
-            <option value="en" selected>English</option>
-            <option value="hi">हिन्दी</option>
-            <option value="mara">मराठी</option>
-            <option value="punjabi">ਪੰਜਾਬੀ</option>
-            <option value="bangali">বাংলা</option>
-            <option value="telugu">తెలుగు</option>
-            <option value="tamil">தமிழ்</option>
-            <option value="malyalam">വിവരങ്ങൾ</option>
-            <option value="gujrati">ગુજરાતી</option>
-            <option value="abc">abc</option>
-            <option value="pqr">pqr</option>
-            <option value="klm">klm</option>
-            <option value="efg">efg</option>
-          </select>
-        </label>
+        <div class="brand__actions">
+          <button
+            type="button"
+            class="theme-toggle"
+            id="themeToggle"
+            aria-label="Switch to light theme"
+            aria-pressed="false"
+          >
+            <span class="theme-toggle__icon theme-toggle__moon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" fill="none"/>
+              </svg>
+            </span>
+            <span class="theme-toggle__icon theme-toggle__sun" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.6"/>
+                <path d="M12 2.5V5M12 19V21.5M21.5 12H19M5 12H2.5M18.4 5.6L16.6 7.4M7.4 16.6L5.6 18.4M18.4 18.4L16.6 16.6M7.4 7.4L5.6 5.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              </svg>
+            </span>
+          </button>
+
+          <label class="lang-select" for="languageSelect">
+            <span class="sr-only">Language</span>
+            <select id="languageSelect">
+              <option value="en" selected>English</option>
+              <option value="hi">हिन्दी</option>
+              <option value="mara">मराठी</option>
+              <option value="punjabi">ਪੰਜਾਬੀ</option>
+              <option value="bangali">বাংলা</option>
+              <option value="telugu">తెలుగు</option>
+              <option value="tamil">தமிழ்</option>
+              <option value="malyalam">വിവരങ്ങൾ</option>
+              <option value="gujrati">ગુજરાતી</option>
+              <option value="abc">abc</option>
+              <option value="pqr">pqr</option>
+              <option value="klm">klm</option>
+              <option value="efg">efg</option>
+            </select>
+          </label>
+        </div>
       </div>
 
       <!-- Tab toggle: switches between Log In and Sign Up -->

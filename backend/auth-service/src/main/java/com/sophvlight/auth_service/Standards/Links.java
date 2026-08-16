@@ -12,6 +12,7 @@ public class Links {
             "/swagger-resources/**",
             "/webjars/**",
             "/ws-chat/**",
-            "/home/**"
+            "/home/**",
+            "/user/oauth"
     };
 }

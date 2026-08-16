@@ -1,11 +1,11 @@
 package com.sophvlight.auth_service.Controller;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -29,15 +29,8 @@ public class UserController {
     public UserController(UserService service){
         this.service=service;
     }
-    @GetMapping("/secure-test")
-    public ResponseEntity<String> testSecureRoute(@RequestHeader(value = "X-Auth-Username", required = false) String username) {
-        if (username == null) {
-            return ResponseEntity.badRequest().body("Gateway failed to inject username header!");
-        }
-        return ResponseEntity.ok("Success! The API Gateway validated the token for user: " + username);
-    }
     @PostMapping("/register")
-    public ResponseEntity<TokenDTO> registerUser(@AuthenticationPrincipal UserData details, @RequestBody Users user) throws GeneralException{
+    public ResponseEntity<TokenDTO> registerUser(@RequestBody Users user) throws GeneralException{
         return new ResponseEntity<>(service.register(user));
     }
     @PostMapping("/login")
@@ -45,12 +38,20 @@ public class UserController {
         return new ResponseEntity<>(service.login(user),HttpStatus.OK);
     }
     @PostMapping("/refresh")
-    public ResponseEntity<TokenDTO> refreshUser(@RequestHeader(value = "refresh-token",required = false) String refreshToken) throws AuthorizationFailureException{
+    public ResponseEntity<TokenDTO> refreshUser(@RequestBody Map<String, String> body) throws AuthorizationFailureException, GeneralException{
+        String refreshToken = body.getOrDefault("token", null);
+        if(refreshToken==null) throw new GeneralException("400:No Refresh Token Found");
         return new ResponseEntity<>(service.refresh(refreshToken),HttpStatus.OK);
     }
     @PostMapping("/logout")
-    public ResponseEntity<TokenDTO> logoutUser(@AuthenticationPrincipal UserDetails uds) throws AuthorizationFailureException{
+    public ResponseEntity<TokenDTO> logoutUser(@AuthenticationPrincipal UserData uds) throws AuthorizationFailureException{
         service.endSession(uds);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+    @PostMapping("/oauth")
+    public ResponseEntity<?> authenticateWithGoogle(@RequestBody Map<String, String> body) throws GeneralException, AuthorizationFailureException {
+        String googleToken = body.getOrDefault("token", null);
+        if(googleToken==null) throw new GeneralException("400:No Oauth Token Found");
+        return new ResponseEntity<>(service.oauth(googleToken),HttpStatus.OK);
     }
 }

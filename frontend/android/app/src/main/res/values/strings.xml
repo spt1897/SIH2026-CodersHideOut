@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Hideout</string>
+    <string name="title_activity_main">Hideout</string>
+    <string name="package_name">com.codershideout.app</string>
+    <string name="custom_url_scheme">com.codershideout.app</string>
+</resources>

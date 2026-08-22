@@ -1,31 +1,27 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import LoginPage from './pages/Auth/LoginPage';
-import DashboardPage from './pages/Dashboard/DashboardPage';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
-// Keep your mock components for the others for now
-const LandingPage = () => <div className="text-white p-8">Landing Page</div>;
+// Import your new Landing Page
+import LandingPage from './pages/LandingPage';
+
+// Import your existing pages (adjust these paths if yours are named differently)
+import LoginPage from './pages/Auth/LoginPage';
+import SignupPage from './pages/Auth/SignupPage';
+import DashboardPage from './pages/Dashboard/DashboardPage';
+import AdminDashboard from './pages/AdminDashboard';
 
 export default function App() {
-  // const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
+        {/* The new default home screen */}
         <Route path="/" element={<LandingPage />} />
-
-
+        
+        {/* Your existing authentication and app routes */}
         <Route path="/login" element={<LoginPage />} />
-
-        {/* <Route
-          path="/dashboard"
-          element={isAuthenticated ? <DashboardPage /> : <Navigate to="/login" replace />}
-        /> */}
-        <Route
-          path="/dashboard"
-          element={<DashboardPage />}
-        />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/admindashboard" element={<AdminDashboard/>} />
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
 }

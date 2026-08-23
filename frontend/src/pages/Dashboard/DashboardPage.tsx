@@ -2,6 +2,8 @@ import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../store/useAuthStore';
 import LiveCapture from '../../components/common/LiveCapture';
 import FileUpload from '../../components/common/FileUpload'; // Import the new component
+import OfflineSyncWidget from '../../components/common/OfflineWidgetSync';
+import SyncHistoryLog from '../../components/common/SyncHistoryLog';
 
 export default function DashboardPage() {
   const { t } = useTranslation();
@@ -34,6 +36,9 @@ export default function DashboardPage() {
           <h2 className="text-xl font-bold text-slate-200 mb-4 w-full max-w-md">Batch Processing</h2>
           <FileUpload />
         </div>
+
+        <OfflineSyncWidget />
+        <SyncHistoryLog />
 
       </main>
 

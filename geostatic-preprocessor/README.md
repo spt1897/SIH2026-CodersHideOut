@@ -1,4 +1,4 @@
-## Geo-Static Pre-processor  **  
+## Geo-Static Pre-processor    
   
 *This is a preprocessing server that is responsible for the precomputation of the Geo-Spatial indexing, mapping landmarks(cities, road, streets, villages, localities, districts, states) with their respective H3 cells and storing it in the Database.*   
   

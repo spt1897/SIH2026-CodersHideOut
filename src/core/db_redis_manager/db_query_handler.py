@@ -23,6 +23,6 @@ async def query_db(query_func: Callable[[asyncpg.Connection],Any],app: FastAPI):
 
         except Exception as err:
             if attempt == config.max_retry:
-                raise FailedDBOperationException()
+                raise FailedDBOperationException(err)
             await asyncio.sleep(delay)
             delay *= 2

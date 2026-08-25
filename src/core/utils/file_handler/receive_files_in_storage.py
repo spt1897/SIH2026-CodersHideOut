@@ -1,6 +1,6 @@
 from fastapi import FastAPI, UploadFile, File,HTTPException, status
 import aiofiles
-import fnmatch
+from fnmatch import fnmatch
 import os
 
 

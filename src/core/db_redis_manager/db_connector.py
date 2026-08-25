@@ -38,7 +38,7 @@ async def connectDB(app:FastAPI):
                 await db_pool.close()
 
             if(attempt == config.max_retry): 
-                raise DBConnectionException()
+                raise DBConnectionException(err)
             await asyncio.sleep(delay)
             delay *=2
 

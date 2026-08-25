@@ -3,15 +3,15 @@ class Config:
     Loaded from environment variables on startup.'''
     def __init__(self):
         #API keys
-        self.bhasini_api_key: str = ""
+        self.bhasini_api_key: str = None
         #DB credentials
-        self.db_url:str = ""
+        self.db_url:str = None
         #Redis credentials
-        self.redis_url:str = ""
+        self.redis_url:str = None
         #Eureka server credentials
-        self.eureka_server_url:str = ""
+        self.eureka_server_url:str = None
         #server settings
-        self.service_name:str =""
+        self.service_name:str =None
         self.max_retry:int =None
         self.retry_delay_init:float = None
         self.timeout:float = None
@@ -26,6 +26,7 @@ class Config:
         self.twilio_phone_no :str = None
         self.twilio_account_sid:str=None
         self.twilio_auth_token:str=None
+        self.twilio_whatsapp_no:str = None
         #smtp
         self.smtp_host:str=None
         self.smtp_port:str =None

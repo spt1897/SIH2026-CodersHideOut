@@ -33,7 +33,7 @@ async def connectRedis(app: FastAPI):
             if redis_client:
                 await redis_client.close()
             if(attempt == config.max_retry): 
-                raise RedisConnectionException()
+                raise RedisConnectionException(err)
             await asyncio.sleep(delay)
             delay *=2;
 

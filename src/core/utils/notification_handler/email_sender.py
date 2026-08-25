@@ -4,8 +4,17 @@ from fastapi import FastAPI
 from src.core.config import Config
 from src.core.exceptions.mid_service_exceptions.email_send_exception import EmailSendException
 import asyncio
+import aiofiles
+import os
+import mimetypes
 
-async def send_email(address_to:str,subject:str, email_body:str,app: FastAPI):
+'''
+Sends Email to any Email address(supported with files) via SMTP server.
+'''
+
+
+
+async def send_email(address_to:str,subject:str, email_body:str,files:list[str], app: FastAPI):
     
     config :Config= app.state.config
     delay  = config.retry_delay_init
@@ -15,6 +24,29 @@ async def send_email(address_to:str,subject:str, email_body:str,app: FastAPI):
     email["Subject"] = subject
     email.set_content(email_body)
 
+    if files:
+        for file in files:
+            if not os.path.exists(file):
+                continue
+
+            content_type, encoding = mimetypes.guess_type(file)
+            if content_type is None or encoding is not None:
+                content_type = "application/octet-stream"
+            
+            maintype, subtype = content_type.split("/", 1)
+
+            async with aiofiles.open(file, "rb") as f:
+                file_data = await f.read()
+
+            filename = os.path.basename(file)
+
+            email.add_attachment(
+                file_data,
+                maintype=maintype,
+                subtype=subtype,
+                filename=filename
+            )
+
     for attempt in range (1,config.max_retry+1):
         try:
             await aiosmtplib.send(
@@ -23,8 +55,8 @@ async def send_email(address_to:str,subject:str, email_body:str,app: FastAPI):
             port=config.smtp_port,
             username=config.smtp_username,
             password=config.smtp_password,
-            start_tls=True,
-            smtputf8=True,
+            use_tls=True,
+            #smtputf8=True,
             timeout=config.timeout,
             )
 
@@ -37,7 +69,4 @@ async def send_email(address_to:str,subject:str, email_body:str,app: FastAPI):
             await asyncio.sleep(delay)
             delay *=2
         
-
-
-
 

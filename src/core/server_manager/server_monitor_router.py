@@ -1,6 +1,7 @@
-from fastapi import APIRouter, status, Request,Response
+from fastapi import FastAPI,APIRouter, status, Request,Response
 import asyncio
 import time
+import py_eureka_client.eureka_client as eureka_client
 '''
 This module is dedicated to health checks , heartbeats and monitoring the
 microservice to ensure its proper working. It routes all server monitoring apis
@@ -40,10 +41,8 @@ def conns_tracker(app_instance):
 
 
 
-#returns server, database and cache health status and heartbeat to eureka
-@monitor.get("/health")
-async def server_health(req:Request, res:Response):
-    state = req.app.state
+#heartbeats to eureka
+async def server_health_check(state):
     health_status = {
         "service_name" :state.config.service_name,
         "Status" : "UP",
@@ -78,10 +77,45 @@ async def server_health(req:Request, res:Response):
         health_status["Cache"] = "DOWN"
 
     if health_status["Database"] =="DOWN" or health_status["Cache"]=="DOWN":
-        res.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
         health_status["Status"] = "DOWN"
 
     return health_status
+
+
+async def heartbeat_sender(app:FastAPI, heartbeat_interval:float =30):
+    await asyncio.sleep(10)
+    state =app.state
+    while True:
+        try:
+                health_status = await server_health_check(state)
+
+                client  = eureka_client.get_client()
+                await client.status_update(health_status["Status"])
+
+                await client.change_my_instance_metadata({
+                                "active_requests": str(state.active_http + state.active_ws),
+                                "Database": health_status["Database"],
+                                "Cache": health_status["Cache"]
+                            })
+
+        except asyncio.CancelledError:
+            break
+
+
+        await asyncio.sleep(heartbeat_interval)
+
+
+
+#monitoring route:
+
+#returns server, database and cache health status
+@monitor.get("/health")
+async def server_health(req:Request):
+    health_status =await  server_health_check(req.app.state)
+   
+    return health_status
+
+
 
 
 #returns server metrics like uptime,start time, no. of requests handled, active requests

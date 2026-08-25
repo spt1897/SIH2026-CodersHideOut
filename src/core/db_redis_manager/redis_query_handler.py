@@ -20,10 +20,10 @@ async def query_redis(query_func :Callable[[redis.Redis],Any],app:FastAPI):
             return await query_func(redis_client)
 
         except redis.ResponseError as err:
-            return err
+            raise err
 
-        except Exception:
+        except Exception as err:
             if attempt==config.max_retry:
-                raise FailedCacheOperationException()
+                raise FailedCacheOperationException(err)
             await asyncio.sleep(delay)
             delay*=2

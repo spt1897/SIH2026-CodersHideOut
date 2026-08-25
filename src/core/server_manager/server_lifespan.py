@@ -6,13 +6,14 @@ from src.core.server_manager.loadenv import loadenv
 from src.core.config import Config
 from src.core.server_manager.appstate import init_appstate
 from fastapi import FastAPI
+from typing import Callable
 import time
 '''
 This file manages the lifespan(initiialization and deinitialisation) of the server.
 Sets up the server by connecting to DB,cache,and registering to Eureka on startup
 and deregistering, disconnecting on shutdown.
 '''
-async def init_server(app: FastAPI):
+async def init_server(app: FastAPI,process_pool_init:Callable=None,args:tuple[()]=None):
     #Create the config object and initialise it with .env variables
     app.state.config = Config()
     loadenv(app)
@@ -20,7 +21,7 @@ async def init_server(app: FastAPI):
     await connectDB(app)
     await connectRedis(app)
     #initialise other app state variables
-    await init_appstate(app)
+    await init_appstate(app,process_pool_init,args)
     #register to eureka now
     await register_service(app)
    
@@ -33,10 +34,14 @@ async def deinit_server(app: FastAPI):
     await disconnectDB(app)
     await disconnectRedis(app)
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    await init_server(app)
-    try:
-        yield
-    finally:
-        await deinit_server(app)
+
+def lifespan(process_pool_init:Callable=None,args:tuple[()]=None):
+    @asynccontextmanager
+    async def _lifespan(app: FastAPI):
+        await init_server(app,process_pool_init,args)
+        try:
+            yield
+        finally:
+            await deinit_server(app)
+
+    return _lifespan

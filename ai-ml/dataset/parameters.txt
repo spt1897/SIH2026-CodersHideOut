@@ -20,6 +20,7 @@ lithology
 
 #solitype file:
 soil_type
+soil_texture
 
 #openstreet_map:
 distance_to_fault_m

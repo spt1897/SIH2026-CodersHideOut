@@ -16,7 +16,7 @@ spi
 roughness
 
 #lithology file:
-lithology
+lithology_encoded
 
 #solitype file(ISRIC):
 soil_type

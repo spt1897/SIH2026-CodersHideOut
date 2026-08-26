@@ -14,7 +14,7 @@ curvature
 twi  
 spi  
 roughness  
-lithology  
+lithology_encoded
 soil_type  
 soil_sand  
 soil_silt  

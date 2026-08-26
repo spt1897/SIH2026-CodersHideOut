@@ -6,7 +6,7 @@ label
 
 #static parameters:
 
-#DEM file:
+#DEM file(SRTM):
 elevation_m
 slope_deg
 aspect_deg
@@ -18,18 +18,20 @@ roughness
 #lithology file:
 lithology
 
-#solitype file:
+#solitype file(ISRIC):
 soil_type
-soil_texture
+soil_sand
+soil_silt
+soil_silt
 
-#openstreet_map:
+#openstreet_map(OSM):
 distance_to_fault_m
 distance_to_road_m
 distance_to_river_m
 drainage_density
 building_density
 
-#landcoverfiles
+#landcoverfiles(ESA worldcover)
 ndvi_baseline
 lulc
 

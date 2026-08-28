@@ -3,33 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TerraSentry — a quiet corner of the internet, built for terrains</title>
+  <meta name="description" content="Coder's Hideoout is a private space to stash snippets, focus without pings, and log what you shipped." />
 
-  <title>Coder's Hideout — A quiet corner of the internet, built for shipping code</title>
-
-  <meta
-    name="description"
-    content="Coder's Hideout is a private space to stash snippets, focus without pings, and log what you shipped."
-  />
-
-  <!-- Prevent theme flash -->
+  <!-- Set the theme before first paint -->
   <script>
     (function () {
       try {
-        var stored = localStorage.getItem("theme");
-        var theme =
-          stored ||
-          (window.matchMedia("(prefers-color-scheme: light)").matches
-            ? "light"
-            : "dark");
-
-        document.documentElement.setAttribute("data-theme", theme);
+        var stored = localStorage.getItem('theme');
+        var theme = stored || (
+          window.matchMedia('(prefers-color-scheme: light)').matches
+            ? 'light'
+            : 'dark'
+        );
+        document.documentElement.setAttribute('data-theme', theme);
       } catch (e) {
-        document.documentElement.setAttribute("data-theme", "dark");
+        document.documentElement.setAttribute('data-theme', 'dark');
       }
     })();
   </script>
 
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
@@ -38,10 +31,10 @@
     rel="stylesheet"
   />
 
-  <!-- Shared CSS -->
+  <!-- Shared styles -->
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Homepage CSS -->
+  <!-- Homepage styles -->
   <link rel="stylesheet" href="home.css" />
 </head>
 
@@ -49,10 +42,7 @@
 
   <a class="skip-link" href="#main">Skip to content</a>
 
-  <!-- =====================================================
-       AMBIENT BACKGROUND
-  ====================================================== -->
-
+  <!-- Ambient background -->
   <div class="aurora" aria-hidden="true">
     <span class="aurora__blob aurora__blob--one"></span>
     <span class="aurora__blob aurora__blob--two"></span>
@@ -60,25 +50,17 @@
     <span class="aurora__grid"></span>
   </div>
 
-
-  <!-- =====================================================
-       NAVIGATION BAR
-  ====================================================== -->
-
+  <!-- ============ NAV ============ -->
   <header class="site-nav">
-
     <div class="site-nav__inner">
 
-      <!-- BRAND -->
-
+      <!-- Brand -->
       <a
         class="brand__link"
         href="home.html"
-        aria-label="Coder's Hideout home"
+        aria-label="TerraSentry home"
       >
-
         <span class="brand__mark" aria-hidden="true">
-
           <svg
             width="20"
             height="20"
@@ -101,40 +83,42 @@
               opacity="0.55"
             />
           </svg>
-
         </span>
 
-        <span class="brand__name">Coder's Hideout</span>
-
+        <span class="brand__name">TerraSentry</span>
       </a>
 
-
-      <!-- MAIN NAVIGATION -->
-
+      <!-- Navigation Links -->
       <nav
         class="site-nav__links"
         id="navLinks"
         aria-label="Primary"
       >
-
         <a href="#about">About</a>
         <a href="#rooms">Rooms</a>
-        <!--<a href="#community">Community</a>-->
+        <a href="#community">Community</a>
         <a href="#updates">Updates</a>
         <a href="#team">Team</a>
         <a href="#faqs">FAQs</a>
         <a href="#feedback">Feedback</a>
         <a href="#contact">Contact Us</a>
 
+        <!-- Mobile-only buttons -->
+        <div class="mobile-nav-actions">
+          <a class="ghost-btn" href="index.html#login">
+            Log in
+          </a>
+
+          <a class="cta-btn" href="index.html#signup">
+            Create your account
+          </a>
+        </div>
       </nav>
 
-
-      <!-- NAV ACTIONS -->
-
+      <!-- Navigation Actions -->
       <div class="site-nav__actions">
 
-        <!-- Theme -->
-
+        <!-- Theme Toggle -->
         <button
           type="button"
           class="theme-toggle"
@@ -142,7 +126,6 @@
           aria-label="Switch to light theme"
           aria-pressed="false"
         >
-
           <span
             class="theme-toggle__icon theme-toggle__moon"
             aria-hidden="true"
@@ -159,6 +142,7 @@
                 stroke="currentColor"
                 stroke-width="1.6"
                 stroke-linejoin="round"
+                fill="none"
               />
             </svg>
           </span>
@@ -190,64 +174,24 @@
               />
             </svg>
           </span>
-
         </button>
 
-
-        <!-- Logged out buttons -->
-
-        <div id="loggedOutActions" class="auth-actions">
-
-          <a
-            class="ghost-btn"
-            href="index.html#login"
-          >
-            Log in
-          </a>
-
-          <a
-            class="cta-btn cta-btn--nav"
-            href="index.html#signup"
-          >
-            Create your hideout
-          </a>
-
-        </div>
-
-
-        <!-- Logged in profile button -->
-
-        <div
-          id="loggedInActions"
-          class="logged-in-actions"
-          hidden
+        <!-- Desktop Buttons -->
+        <a
+          class="ghost-btn desktop-login"
+          href="index.html#login"
         >
+          Log in
+        </a>
 
-          <button
-            type="button"
-            class="profile-trigger"
-            id="profileTrigger"
-            aria-expanded="false"
-            aria-controls="profileSidebar"
-          >
+        <a
+          class="cta-btn cta-btn--nav desktop-signup"
+          href="index.html#signup"
+        >
+          Create your account
+        </a>
 
-            <img
-              id="navProfileImage"
-              src="https://ui-avatars.com/api/?name=User&background=2563eb&color=fff"
-              alt="Profile picture"
-            />
-
-            <span id="navUserName">User</span>
-
-            <span class="profile-arrow">⌄</span>
-
-          </button>
-
-        </div>
-
-
-        <!-- Mobile menu -->
-
+        <!-- Mobile Menu Toggle -->
         <button
           type="button"
           class="nav-toggle"
@@ -262,149 +206,38 @@
         </button>
 
       </div>
-
     </div>
-
   </header>
 
-
-  <!-- =====================================================
-       PROFILE SIDEBAR
-  ====================================================== -->
-
-  <aside
-    class="profile-sidebar"
-    id="profileSidebar"
-    aria-hidden="true"
-  >
-
-    <div class="profile-sidebar__header">
-
-      <h3>Your Hideout</h3>
-
-      <button
-        type="button"
-        class="profile-close"
-        id="profileClose"
-        aria-label="Close profile menu"
-      >
-        ×
-      </button>
-
-    </div>
-
-
-    <div class="profile-user">
-
-      <img
-        id="sidebarProfileImage"
-        src="https://ui-avatars.com/api/?name=User&background=2563eb&color=fff"
-        alt="Profile picture"
-      />
-
-      <h3 id="sidebarUserName">User Name</h3>
-
-      <p id="sidebarUserEmail">
-        user@example.com
-      </p>
-
-    </div>
-
-
-    <div class="profile-menu">
-
-      <a href="dashboard.html">
-        <span>📊</span>
-        Dashboard
-      </a>
-
-      <a href="profile.html">
-        <span>👤</span>
-        My Profile
-      </a>
-
-      <a href="#rooms">
-        <span>🗂️</span>
-        My Rooms
-      </a>
-
-      <a href="#updates">
-        <span>🔔</span>
-        Notifications
-      </a>
-
-      <a href="settings.html">
-        <span>⚙️</span>
-        Settings
-      </a>
-
-    </div>
-
-
-    <div class="profile-sidebar__footer">
-
-      <button
-        type="button"
-        class="logout-btn"
-        id="logoutBtn"
-      >
-        <span>↪</span>
-        Log out
-      </button>
-
-    </div>
-
-  </aside>
-
-
-  <!-- Sidebar overlay -->
-
-  <div
-    class="profile-overlay"
-    id="profileOverlay"
-    aria-hidden="true"
-  ></div>
-
-
-  <!-- =====================================================
-       MAIN
-  ====================================================== -->
-
+  <!-- ============ MAIN CONTENT ============ -->
   <main id="main">
 
-
-    <!-- =================================================
-         HERO
-    ================================================== -->
-
+    <!-- ============ HERO ============ -->
     <section class="hero">
 
       <div class="hero__copy">
 
         <p class="eyebrow">
-          Welcome to Coder's HideOut
+          early warning system
         </p>
 
         <h1 class="hero__title">
-          A quiet corner of the internet, built for shipping code.
+          Disaster Management and landslide early warning system
         </h1>
 
         <p class="hero__subtitle">
-
-          Coder's Hideout is a private space for the code you're
-          not ready to show anyone — snippets, half-built ideas,
-          and the projects you keep coming back to at night.
-
+          Lorem ipsum dolor sit amet consectetur adipisicing elit.
+          Doloribus quam omnis, necessitatibus adipisci ab modi
+          asperiores vero molestiae ipsum minima porro explicabo
+          tenetur saepe placeat ratione est, velit ea quibusdam.
         </p>
 
-
         <div class="hero__actions">
-
           <a
             class="cta-btn"
             href="index.html#signup"
           >
-            Create your hideout
+            Create your account
           </a>
 
           <a
@@ -413,30 +246,24 @@
           >
             I already have a key →
           </a>
-
         </div>
 
-
         <p class="hero__note">
-          Free to start. No credit card. Cancel by just closing the tab.
+          Free to start. Cancel by just closing the tab.
         </p>
 
       </div>
 
-
-      <!-- CODE WINDOW -->
-
+      <!-- Hero Visual -->
       <div
         class="hero__visual"
         aria-hidden="true"
       >
-
         <div class="window">
 
           <div class="window__glow"></div>
 
           <div class="window__bar">
-
             <span></span>
             <span></span>
             <span></span>
@@ -444,9 +271,7 @@
             <span class="window__bar-label">
               ~/hideout
             </span>
-
           </div>
-
 
           <pre class="window__code"><code><span class="c-muted">$</span> new feature 4681 added <span class="c-string">"you can now edit xyz"</span>
 <span class="c-muted">$</span> new feature 4680 added
@@ -454,97 +279,92 @@
 <span class="c-muted">$</span> <span class="cursor"></span></code></pre>
 
         </div>
-
       </div>
 
     </section>
 
-
-    <!-- =================================================
-         ABOUT
-    ================================================== -->
-
+    <!-- ============ ABOUT ============ -->
     <section
-      class="about-section"
+      class="about"
       id="about"
     >
 
       <div class="section-head">
 
         <p class="eyebrow">
-          About Coder's Hideout
+          About
         </p>
 
         <h2>
-          Built for developers who love to build.
+          Why we built TerraSentry.
         </h2>
 
         <p class="section-sub">
-          A focused digital space where ideas can grow
-          before they are ready for the outside world.
+          Lorem ipsum dolor sit amet consectetur adipisicing elit aperiam!.
         </p>
 
       </div>
 
+      <div class="about__grid">
 
-      <div class="about-grid">
-
-        <div class="about-card">
-
-          <div class="about-icon">💡</div>
-
-          <h3>
-            Think
-          </h3>
+        <div class="about__text">
 
           <p>
-            Capture ideas, experiment with concepts,
-            and keep your unfinished thoughts in one place.
+            Lorem ipsum dolor sit amet consectetur, adipisicing elit.
+            Voluptate repudiandae, officiis, odio non maiores beatae
+            labore, dolorum autem cupiditate molestiae totam id.
+            Necessitatibus possimus expedita odit ea porro perferendis
+            eum! Lorem ipsum dolor sit amet consectetur adipisicing elit.
+            Molestias odio ullam libero.
+          </p>
+
+          <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit.
+            Quae odio consequuntur quasi nihil, similique vel qui
+            explicabo! Distinctio natus voluptates eos. Maiores nobis
+            qui rerum. Delectus natus at dolore nostrum.
           </p>
 
         </div>
 
+        <div class="about__stats">
 
-        <div class="about-card">
+          <div class="about__stat">
+            <span class="about__stat-number">
+              4
+            </span>
 
-          <div class="about-icon">💻</div>
+            <span class="about__stat-label">
+              rooms to work in
+            </span>
+          </div>
 
-          <h3>
-            Build
-          </h3>
+          <div class="about__stat">
+            <span class="about__stat-number">
+              1
+            </span>
 
-          <p>
-            Store snippets, projects and experiments
-            without the pressure of making everything perfect.
-          </p>
+            <span class="about__stat-label">
+              place for it all
+            </span>
+          </div>
 
-        </div>
+          <div class="about__stat">
+            <span class="about__stat-number">
+              0
+            </span>
 
-
-        <div class="about-card">
-
-          <div class="about-icon">🚀</div>
-
-          <h3>
-            Ship
-          </h3>
-
-          <p>
-            Track your progress and turn those late-night
-            ideas into something real.
-          </p>
+            <span class="about__stat-label">
+              notifications you didn't ask for
+            </span>
+          </div>
 
         </div>
 
       </div>
-
     </section>
 
-
-    <!-- =================================================
-         ROOMS
-    ================================================== -->
-
+    <!-- ============ ROOMS ============ -->
     <section
       class="rooms"
       id="rooms"
@@ -553,176 +373,206 @@
       <div class="section-head">
 
         <p class="eyebrow">
-          Inside the hideout
+          Inside the TerraSentry
         </p>
 
         <h2>
           Everything you need is already inside.
         </h2>
 
-        <p class="section-sub">
-          Four rooms, no roommates required.
-        </p>
-
       </div>
-
 
       <div class="rooms__grid">
 
-
+        <!-- Feature 1 -->
         <article class="room-card">
 
           <span
             class="room-card__icon"
             aria-hidden="true"
           >
-            🔐
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect
+                x="4"
+                y="10"
+                width="16"
+                height="10"
+                rx="2"
+                stroke="currentColor"
+                stroke-width="1.6"
+              />
+
+              <path
+                d="M8 10V7a4 4 0 0 1 8 0v3"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+              />
+            </svg>
           </span>
 
           <h3>
-            Room 1
+            Feature 1
           </h3>
 
           <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloremque, porro? Quibusdam unde vel ad eius quo rerum. Voluptatum tempora laudantium non. Beatae praesentium temporibus dolor deleniti ratione? Laudantium, sit sapiente.
+            Lorem ipsum dolor sit amet consectetur adipisicing elit.
+            Facilis, consequatur dolor? Aliquid iure aspernatur illum
+            accusamus!
           </p>
 
         </article>
 
-
+        <!-- Feature 2 -->
         <article class="room-card">
 
           <span
             class="room-card__icon"
             aria-hidden="true"
           >
-            ⏱️
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle
+                cx="12"
+                cy="12"
+                r="9"
+                stroke="currentColor"
+                stroke-width="1.6"
+              />
+
+              <path
+                d="M12 7v5l3.5 2"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
           </span>
 
           <h3>
-         Room 2
+            Feature 2
           </h3>
 
           <p>
-            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Asperiores nobis aut voluptatum accusantium eos, pariatur minima laudantium accusamus, sit dolorum tenetur iusto ducimus autem modi numquam, voluptatibus tempora earum suscipit!
+            Lorem ipsum, dolor sit amet consectetur adipisicing elit.
+            Cumque officiis ex sed consectetur atque repudiandae
+            doloribus ipsam possimus incidunt, tenetur dolorum.
           </p>
 
         </article>
 
-
+        <!-- Feature 3 -->
         <article class="room-card">
 
           <span
             class="room-card__icon"
             aria-hidden="true"
           >
-            📝
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M6 4h9l4 4v12H6V4Z"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linejoin="round"
+              />
+
+              <path
+                d="M9.5 12h6M9.5 15.5h6M9.5 8.5h3"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+              />
+            </svg>
           </span>
 
           <h3>
-            Room 3
+            Feature 3
           </h3>
 
           <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Placeat cum ex eius at a blanditiis asperiores quas eos quia molestiae repellat iste aliquid amet dignissimos, numquam nulla molestias? Placeat, similique.
+            Lorem, ipsum dolor sit amet consectetur adipisicing elit.
+            Asperiores dolores natus beatae iste sit dignissimos cum.
           </p>
 
         </article>
 
-
+        <!-- Feature 4 -->
         <article class="room-card">
 
           <span
             class="room-card__icon"
             aria-hidden="true"
           >
-            👥
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle
+                cx="8.5"
+                cy="10"
+                r="3"
+                stroke="currentColor"
+                stroke-width="1.6"
+              />
+
+              <circle
+                cx="16"
+                cy="9"
+                r="2.4"
+                stroke="currentColor"
+                stroke-width="1.6"
+              />
+
+              <path
+                d="M3.5 19c0-2.8 2.2-5 5-5s5 2.2 5 5M13.8 14.4c2.3.2 4.2 2.1 4.2 4.6"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+              />
+            </svg>
           </span>
 
           <h3>
-            Room 4
+            Feature 4
           </h3>
 
-          <p>
-            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Delectus, aut? Nemo esse asperiores aspernatur assumenda laudantium voluptates suscipit perferendis? Commodi ut molestias molestiae placeat incidunt blanditiis eveniet expedita voluptates debitis.
+          <p id="community">
+            Lorem ipsum dolor, sit amet consectetur adipisicing elit.
+            Pariatur cupiditate dolorum similique, amet repellendus.
           </p>
 
         </article>
 
       </div>
-
     </section>
 
-
-    <!-- =================================================
-         COMMUNITY
-    ================================================== -->
-
-   <!-- <section
-      class="community-section"
-      id="community"
-    >
-
-      <div class="section-head">
-
-        <p class="eyebrow">
-          Community
-        </p>
-
-        <h2>
-          Build alone. Grow together.
-        </h2>
-
-        <p class="section-sub">
-          A space where developers can share ideas,
-          learn from each other and stay inspired.
-        </p>
-
-      </div>
-
-
-      <div class="community-card">
-
-        <div class="community-content">
-
-          <span class="community-icon">
-            👨‍💻
-          </span>
-
-          <h3>
-            Your coding journey doesn't have to be lonely.
-          </h3>
-
-          <p>
-            Share knowledge, discover new projects,
-            ask questions and connect with developers
-            who understand the joy of building things.
-          </p>
-
-          <a
-            href="#contact"
-            class="cta-btn"
-          >
-            Join the community
-          </a>
-
-        </div>
-
-      </div>
-
-    </section>-->
-
-
-    <!-- =================================================
-         STATS
-    ================================================== -->
-
+    <!-- ============ STATS ============ -->
     <section class="stats">
 
       <div class="stats__grid">
 
         <div class="stat">
-
           <span
             class="stat__number"
             data-count="2100000"
@@ -731,14 +581,11 @@
           </span>
 
           <span class="stat__label">
-            snippets saved
+            total users
           </span>
-
         </div>
 
-
         <div class="stat">
-
           <span
             class="stat__number"
             data-count="48000"
@@ -747,14 +594,11 @@
           </span>
 
           <span class="stat__label">
-            late-night sessions logged
+            current users
           </span>
-
         </div>
 
-
         <div class="stat">
-
           <span
             class="stat__number"
             data-count="0"
@@ -763,20 +607,33 @@
           </span>
 
           <span class="stat__label">
-            ads, ever
+            updates
           </span>
-
         </div>
 
       </div>
+    </section>
+
+    <!-- ============ TESTIMONIAL ============ -->
+    <section class="quote-section">
+
+      <blockquote class="quote-card">
+
+        <p>
+          <span class="c-muted">//</span>
+          Where innovation meets real-world impact.
+        </p>
+
+        <footer>
+          Saptarshi, Souvik, Srijan, Shruti, Kiran, Avik
+          — Team TerraSentry
+        </footer>
+
+      </blockquote>
 
     </section>
 
-
-    <!-- =================================================
-         UPDATES
-    ================================================== -->
-
+    <!-- ============ UPDATES ============ -->
     <section
       class="updates"
       id="updates"
@@ -789,140 +646,107 @@
         </p>
 
         <h2>
-          Recently added to the hideout.
+          Recently added to the TerraSentry.
         </h2>
 
       </div>
 
-
       <ul class="updates__list">
 
         <li>
-
           <span class="updates__tag">
             New
           </span>
 
           <p>
-            <strong>Focus timer sounds</strong>
-            — rain, keyboard clatter, or silence.
-            The Workbench remembers your pick.
+            <strong>bghsjjsuaj</strong>
+            — Lorem ipsum dolor sit amet consectetur adipisicing elit.
           </p>
-
         </li>
 
-
         <li>
-
           <span class="updates__tag updates__tag--fix">
             Improved
           </span>
 
           <p>
-            <strong>Faster Vault search</strong>
-            — snippets now surface as you type,
-            not after you finish typing.
+            <strong>gzshxjza</strong>
+            — Lorem ipsum dolor sit, amet consectetur adipisicing elit.
+            Ad omnis iure
           </p>
-
         </li>
 
-
         <li>
-
           <span class="updates__tag">
             New
           </span>
 
           <p>
-            <strong>Ship Log streaks</strong>
-            — see how many days in a row you've shown up.
+            <strong>ngfjsjjukzb</strong>
+            — Lorem ipsum dolor sit amet consectetur adipisicing elit.
+            Tempore sint.
           </p>
-
         </li>
 
       </ul>
-
     </section>
 
-
-    <!-- =================================================
-         TEAM
-    ================================================== -->
-
+    <!-- ============ TEAM ============ -->
     <section
-      class="team-section"
+      class="team"
       id="team"
     >
 
       <div class="section-head">
 
         <p class="eyebrow">
-          Meet the team
+          Team
         </p>
 
         <h2>
-          The people behind the hideout.
+          The people behind the TerraSentry.
         </h2>
 
-        <p class="section-sub">
-          A team of developers building for developers.
-        </p>
-
       </div>
 
-
-      <div class="team-grid">
-
-
+      <div class="team__grid">
 
         <article class="team-card">
-
-          <div class="team-avatar">
-            Frontend
-          </div>
-
-          <h3>
-            Srijan & Shruti
-          </h3>
+          <span class="team-card__avatar">S</span>
+          <h3>Saptarshi</h3>
         </article>
 
-
         <article class="team-card">
-
-          <div class="team-avatar">
-            Backend
-          </div>
-
-          <h3>
-            Souvik & Saptarshi
-          </h3>
-
-
+          <span class="team-card__avatar">S</span>
+          <h3>Souvik</h3>
         </article>
 
+        <article class="team-card">
+          <span class="team-card__avatar">S</span>
+          <h3>Srijan</h3>
+        </article>
 
         <article class="team-card">
+          <span class="team-card__avatar">S</span>
+          <h3>Shruti</h3>
+        </article>
 
-          <div class="team-avatar">
-            AI/ML
-          </div>
+        <article class="team-card">
+          <span class="team-card__avatar">K</span>
+          <h3>Kiran</h3>
+        </article>
 
-          <h3>
-            Kiran & Avik
-          </h3>
+        <article class="team-card">
+          <span class="team-card__avatar">A</span>
+          <h3>Avik</h3>
         </article>
 
       </div>
-
     </section>
 
-
-    <!-- =================================================
-         FAQ
-    ================================================== -->
-
+    <!-- ============ FAQS ============ -->
     <section
-      class="faq-section"
+      class="faqs"
       id="faqs"
     >
 
@@ -933,373 +757,292 @@
         </p>
 
         <h2>
-          Questions? We've got answers.
+          Questions people actually ask.
         </h2>
 
       </div>
 
-
-      <div class="faq-list">
-
+      <div class="faqs__list">
 
         <details class="faq-item">
-
           <summary>
-            What is Coder's Hideout?
+            Is TerraSentry free to use?
           </summary>
 
           <p>
-            Coder's Hideout is a Lorem, ipsum dolor sit amet consectetur adipisicing elit. Voluptas beatae libero cumque ducimus explicabo pariatur aspernatur odit! Recusandae assumenda nemo at facilis obcaecati quia, ea blanditiis ipsam optio, vero laborum.
+            Yes — creating a TerraSentry and using all features is free.
           </p>
-
         </details>
 
-
         <details class="faq-item">
-
           <summary>
-            Is Coder's Hideout free?
+            question 2
           </summary>
 
           <p>
-            Yes. You can start using the core features
-            without needing a credit card.
+            Lorem ipsum dolor sit amet consectetur adipisicing elit.
+            Vel tenetur, assumenda ratione Ad.
           </p>
-
         </details>
 
-
         <details class="faq-item">
-
           <summary>
-            Question 2
+            Can I use it on my phone?
           </summary>
 
           <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente unde saepe ad quaerat porro doloremque. Odio, natus fuga. 
+            The TerraSentry is fully responsive, so you can check on
+            Terrasentry app or browse the Vault from your phone.
           </p>
-
         </details>
 
-
         <details class="faq-item">
-
           <summary>
-            Question 3
+            question 4
           </summary>
 
           <p>
-           Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloribus, nam! Expedita reprehenderit sed quia necessitatibus quisquam nisi 
+            Lorem ipsum dolor, sit amet consectetur adipisicing elit.
+            Quae velit est sapiente eligendi dolores quasi necessitatibus
+            blanditiis sit, nulla consequatur.
           </p>
-
         </details>
 
-
         <details class="faq-item">
-
           <summary>
-            Can I give feedback?
+            question 5
           </summary>
 
           <p>
-            Absolutely. Use the Feedback section below
-            to tell us what you like, what can be improved,
-            or what features you'd like to see.
+            Lorem ipsum dolor sit amet consectetur adipisicing elit.
+            Eligendi illum voluptates temporibus adipisci id nisi
+            consectetur cumque quibusdam eos.
           </p>
-
         </details>
 
       </div>
-
     </section>
 
-
-    <!-- =================================================
-         FEEDBACK
-    ================================================== -->
-
+    <!-- ============ FEEDBACK ============ -->
     <section
-      class="feedback-section"
+      class="feedback"
       id="feedback"
     >
 
       <div class="section-head">
 
         <p class="eyebrow">
-          Your voice matters
+          Feedback
         </p>
 
         <h2>
-          Help us improve the hideout.
+          Tell us what's missing.
         </h2>
 
         <p class="section-sub">
-          Tell us what you think, report an issue,
-          or suggest something you'd love to see.
+          We read everything and try to improve in best possible way.
         </p>
 
       </div>
 
-
       <form
-        class="feedback-form"
+        class="simple-form"
         id="feedbackForm"
+        novalidate
       >
 
-        <div class="feedback-row">
+        <div class="field">
 
-          <div class="form-group">
+          <label for="feedbackName">
+            Name (optional)
+          </label>
 
-            <label for="feedbackName">
-              Name
-            </label>
-
+          <div class="input-shell">
             <input
               type="text"
               id="feedbackName"
+              name="name"
               placeholder="Your name"
-              required
             />
-
-          </div>
-
-
-          <div class="form-group">
-
-            <label for="feedbackEmail">
-              Email
-            </label>
-
-            <input
-              type="email"
-              id="feedbackEmail"
-              placeholder="you@example.com"
-              required
-            />
-
           </div>
 
         </div>
 
-
-        <div class="form-group">
-
-          <label for="feedbackType">
-            Feedback type
-          </label>
-
-          <select
-            id="feedbackType"
-            required
-          >
-
-            <option value="">
-              Select an option
-            </option>
-
-            <option value="suggestion">
-              Feature suggestion
-            </option>
-
-            <option value="bug">
-              Report a bug
-            </option>
-
-            <option value="experience">
-              User experience
-            </option>
-
-            <option value="other">
-              Other
-            </option>
-
-          </select>
-
-        </div>
-
-
-        <div class="form-group">
+        <div class="field">
 
           <label for="feedbackMessage">
-            Your feedback
+            What's on your mind?
           </label>
 
-          <textarea
-            id="feedbackMessage"
-            rows="5"
-            placeholder="Tell us what you think..."
-            required
-          ></textarea>
+          <div class="input-shell">
+            <textarea
+              id="feedbackMessage"
+              name="message"
+              rows="4"
+              placeholder="A feature you want, a bug you found, anything really"
+              required
+            ></textarea>
+          </div>
 
         </div>
-
 
         <button
           type="submit"
-          class="cta-btn"
+          class="cta-btn simple-form__submit"
+          id="feedbackSubmit"
         >
-          Send Feedback →
+          <span class="submit-label">
+            Send feedback
+          </span>
         </button>
 
         <p
-          class="feedback-success"
-          id="feedbackSuccess"
-          hidden
-        >
-          ✓ Thank you! Your feedback has been recorded.
-        </p>
+          class="simple-form__note"
+          id="feedbackNote"
+          role="status"
+          aria-live="polite"
+        ></p>
 
       </form>
-
     </section>
 
-
-    <!-- =================================================
-         CONTACT
-    ================================================== -->
-
+    <!-- ============ CONTACT US ============ -->
     <section
-      class="contact-section"
+      class="contact"
       id="contact"
     >
 
       <div class="section-head">
 
         <p class="eyebrow">
-          Contact Us
+          Contact us
         </p>
 
         <h2>
-          Let's talk.
+          Reach the people running the TerraSentry.
         </h2>
 
         <p class="section-sub">
-          Have a question, suggestion or collaboration idea?
-          We'd love to hear from you.
+          Or write to us directly at
+          <a
+            class="contact__email"
+            href="mailto:hello@terrasentry.dev"
+          >
+            hello@terrasentry.dev
+          </a>
         </p>
 
       </div>
 
+      <form
+        class="simple-form"
+        id="contactForm"
+        novalidate
+      >
 
-      <div class="contact-grid">
+        <div class="field">
 
+          <label for="contactEmail">
+            Your email
+          </label>
 
-        <div class="contact-card">
-
-          <span class="contact-icon">
-            ✉️
-          </span>
-
-          <h3>
-            Email
-          </h3>
-
-          <p>
-            Have a question?
-          </p>
-
-          <a href="mailto:hello@codershideout.com">
-            hello@codershideout.com
-          </a>
-
-        </div>
-
-
-        <!--<div class="contact-card">
-
-          <span class="contact-icon">
-            💬
-          </span>
-
-          <h3>
-            Community
-          </h3>
-
-          <p>
-            Join the conversation.
-          </p>
-
-          <a href="#community">
-            Explore Community →
-          </a>
-
-        </div>-->
-
-
-        <div class="contact-card">
-
-          <span class="contact-icon">
-            🐙
-          </span>
-
-          <h3>
-            GitHub
-          </h3>
-
-          <p>
-            Explore our project.
-          </p>
-
-          <a
-            href="#"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            View Repository →
-          </a>
+          <div class="input-shell">
+            <input
+              type="email"
+              id="contactEmail"
+              name="email"
+              placeholder="you@email.com"
+              required
+            />
+          </div>
 
         </div>
 
-      </div>
+        <div class="field">
 
+          <label for="contactSubject">
+            Subject
+          </label>
+
+          <div class="input-shell">
+            <input
+              type="text"
+              id="contactSubject"
+              name="subject"
+              placeholder="What's this about?"
+              required
+            />
+          </div>
+
+        </div>
+
+        <div class="field">
+
+          <label for="contactMessage">
+            Message
+          </label>
+
+          <div class="input-shell">
+            <textarea
+              id="contactMessage"
+              name="message"
+              rows="4"
+              placeholder="Write your message here"
+              required
+            ></textarea>
+          </div>
+
+        </div>
+
+        <button
+          type="submit"
+          class="cta-btn simple-form__submit"
+          id="contactSubmit"
+        >
+          <span class="submit-label">
+            Send message
+          </span>
+        </button>
+
+        <p
+          class="simple-form__note"
+          id="contactNote"
+          role="status"
+          aria-live="polite"
+        ></p>
+
+      </form>
     </section>
 
-
-    <!-- =================================================
-         FINAL CTA
-    ================================================== -->
-
+    <!-- ============ FOOTER CTA ============ -->
     <section class="footer-cta">
 
       <h2>
-        Your hideout is one click away.
+        Your TerraSentry is one click away.
       </h2>
-
-      <p>
-        Build quietly. Ship boldly.
-      </p>
 
       <a
         class="cta-btn cta-btn--lg"
         href="index.html#signup"
       >
-        Create your hideout
+        Create your account
       </a>
 
     </section>
 
   </main>
 
-
-  <!-- =====================================================
-       FOOTER
-  ====================================================== -->
-
+  <!-- ============ FOOTER ============ -->
   <footer class="site-footer">
 
     <div class="site-footer__inner">
 
-
       <a
         class="brand__link"
         href="home.html"
-        aria-label="Coder's Hideout home"
+        aria-label="TerraSentry home"
       >
-
-        <span
-          class="brand__mark"
-          aria-hidden="true"
-        >
+        <span class="brand__mark" aria-hidden="true">
 
           <svg
             width="18"
@@ -1308,7 +1051,6 @@
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
-
             <path
               d="M12 2L21 7V17L12 22L3 17V7L12 2Z"
               stroke="currentColor"
@@ -1325,42 +1067,33 @@
             />
 
           </svg>
-
         </span>
 
         <span class="brand__name">
-          Coder's Hideout
+          TerraSentry
         </span>
-
       </a>
-
 
       <nav
         class="site-footer__links"
         aria-label="Footer"
       >
-
         <a href="#about">About</a>
         <a href="#rooms">Rooms</a>
-       <!-- <a href="#community">Community</a>-->
+        <a href="#community">Community</a>
         <a href="#updates">Updates</a>
         <a href="#team">Team</a>
         <a href="#faqs">FAQs</a>
         <a href="#feedback">Feedback</a>
         <a href="#contact">Contact Us</a>
-
+        <a href="index.html#login">Log in</a>
       </nav>
-
-
-     <!-- <p class="site-footer__copy">
-        Built for the ones still up at 2am.
-      </p>-->
 
     </div>
 
   </footer>
 
-
+  <!-- JavaScript -->
   <script src="home.js"></script>
 
 </body>

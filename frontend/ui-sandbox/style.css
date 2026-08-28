@@ -494,6 +494,30 @@ p {
 }
 
 
+.brand__link {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: var(--space-2);
+
+  color: inherit;
+
+  text-decoration: none;
+
+  border-radius: 10px;
+}
+
+
+.brand__link:focus-visible {
+
+  outline: 2px solid var(--accent);
+
+  outline-offset: 3px;
+}
+
+
 .brand__mark {
 
   display: grid;
@@ -638,6 +662,10 @@ p {
   font-size: 18px;
 
   line-height: 1;
+
+  display: grid;
+
+  place-items: center;
 
   transition:
     opacity 0.25s ease,
@@ -1736,5 +1764,385 @@ and (max-width: 900px) {
   .auth-card {
 
     max-width: 440px;
+  }
+}
+
+
+/* ============================================================
+   ACCOUNT TYPE TOGGLE (citizen / official)
+   Same visual language as .tabs, kept as a separate component
+   since it governs which fields render, not which panel slides in.
+   ============================================================ */
+
+.user-type {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: 4px;
+  margin-bottom: var(--space-4);
+}
+
+.user-type__btn {
+  position: relative;
+  z-index: 2;
+  border: none;
+  background: transparent;
+  padding: 9px 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  border-radius: var(--radius-pill);
+  transition: color 0.3s var(--ease);
+}
+
+.user-type__btn.is-active {
+  color: #FFFFFF;
+}
+
+.user-type__btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.user-type__indicator {
+  position: absolute;
+  z-index: 1;
+  top: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  height: calc(100% - 8px);
+  border-radius: var(--radius-pill);
+  background: linear-gradient(135deg, var(--periwinkle), #0891B2);
+  box-shadow: 0 6px 18px -6px rgba(34, 211, 238, 0.5);
+  transition: transform 0.42s var(--ease);
+}
+
+.user-type__indicator.is-official {
+  transform: translateX(100%);
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  box-shadow: 0 6px 18px -6px rgba(37, 99, 235, 0.6);
+}
+
+
+/* ============================================================
+   ROLE VISIBILITY
+   Both citizen and official fields live in the DOM at once;
+   these two rules show only the set matching the current
+   account type. Kept as plain display:none so hidden fields
+   contribute zero height to the auto-sizing viewport.
+   ============================================================ */
+
+.auth-card[data-user-type="citizen"] .official-only {
+  display: none;
+}
+
+.auth-card[data-user-type="official"] .citizen-only {
+  display: none;
+}
+
+
+/* ============================================================
+   MULTI-STEP FORMS (OTP / MFA)
+   ============================================================ */
+
+.form-step[hidden] {
+  display: none;
+}
+
+.otp-info {
+  font-size: var(--fs-small);
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0 0 var(--space-3);
+}
+
+.otp-info strong {
+  color: var(--text-primary);
+}
+
+.otp-input {
+  letter-spacing: 0.5em;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: center;
+  padding-left: 10px !important;
+}
+
+.resend-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 var(--space-2);
+}
+
+.disclosure {
+  font-size: var(--fs-small);
+  color: var(--text-faint);
+  line-height: 1.5;
+  margin: 0 0 var(--space-3);
+}
+
+.field__optional {
+  font-weight: 400;
+  color: var(--text-faint);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+
+/* ============================================================
+   INPUT PREFIX (e.g. +91)
+   ============================================================ */
+
+.input-shell--prefix .input-prefix {
+  padding-left: 14px;
+  padding-right: 4px;
+  color: var(--text-muted);
+  font-size: var(--fs-input);
+  font-weight: 600;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  margin-right: 4px;
+  align-self: center;
+  line-height: 1;
+  padding-top: 13px;
+  padding-bottom: 13px;
+}
+
+
+/* ============================================================
+   SELECTS INSIDE INPUT-SHELL
+   Reuses the same shell as text inputs so dropdowns look
+   consistent with the rest of the form.
+   ============================================================ */
+
+.input-shell select {
+  flex: 1;
+  min-width: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  background:
+    transparent
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394A3B8' stroke-width='1.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    no-repeat right 14px center;
+  border: none;
+  outline: none;
+  padding: 13px 34px 13px 14px;
+  font-size: var(--fs-input);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.input-shell select:invalid {
+  color: var(--text-faint);
+}
+
+.input-shell select option {
+  background: #1E293B;
+  color: var(--text-primary);
+}
+
+:root[data-theme="light"] .input-shell select option {
+  background: #FFFFFF;
+  color: #0F172A;
+}
+
+
+/* ============================================================
+   FILE UPLOAD
+   ============================================================ */
+
+.file-shell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.file-shell__btn {
+  flex-shrink: 0;
+  padding: 10px 18px;
+  border-radius: var(--radius-input);
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: var(--fs-label);
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s var(--ease), background 0.2s var(--ease);
+}
+
+.file-shell__btn:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.file-input:focus-visible + .file-shell__btn {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.file-shell__name {
+  font-size: var(--fs-small);
+  color: var(--text-faint);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-shell__name.has-file {
+  color: var(--text-primary);
+}
+
+
+/* ============================================================
+   RADIO GROUP (MFA method)
+   ============================================================ */
+
+.radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.radio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-small);
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+}
+
+.radio input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.radio__dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  transition: border-color 0.2s var(--ease);
+}
+
+.radio__dot::after {
+  content: '';
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--accent);
+  transform: scale(0);
+  transition: transform 0.15s var(--ease);
+}
+
+.radio input:checked + .radio__dot {
+  border-color: var(--accent);
+}
+
+.radio input:checked + .radio__dot::after {
+  transform: scale(1);
+}
+
+.radio input:focus-visible + .radio__dot {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.radio input:checked ~ span:last-child {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+
+/* ============================================================
+   FIELD GROUP (jurisdiction fieldset)
+   ============================================================ */
+
+.field-group {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  padding: var(--space-4);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.field-group legend {
+  padding: 0 6px;
+  font-size: var(--fs-label);
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.field-group .field__hint {
+  margin-top: 0;
+}
+
+
+/* ============================================================
+   RESPONSIVE — new auth components
+   ============================================================ */
+
+@media (max-width: 480px) {
+  .user-type__btn {
+    font-size: 0.72rem;
+    padding: 9px 4px;
+  }
+
+  .field-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .radio-group {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .file-shell {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .resend-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .otp-input {
+    letter-spacing: 0.35em;
   }
 }

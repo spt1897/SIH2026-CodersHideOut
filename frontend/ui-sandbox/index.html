@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome — Sign In or Create an Account</title>
+  <title>Welcome — Sign In or Register</title>
 
   <!-- Set the theme before first paint so there's no flash of the
        wrong theme. Reads a saved choice from localStorage, falling
@@ -38,21 +38,21 @@
   </div>
 
   <main class="page">
-    <div class="auth-card" id="authCard">
+    <div class="auth-card" id="authCard" data-user-type="citizen">
 
       <!-- Brand mark + theme toggle + language selector. The language
            dropdown is purely visual for now — it doesn't translate any
-           text or talk to a backend. It just lets the user pick a
-           language, which you can read from #languageSelect.value
-           whenever you're ready to wire it up. -->
+           text or talk to a backend. -->
       <div class="brand">
-        <span class="brand__mark" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2L21 7V17L12 22L3 17V7L12 2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
-            <path d="M12 2V22M3 7L12 12L21 7M3 17L12 12L21 17" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" opacity="0.55"/>
-          </svg>
-        </span>
-        <span class="brand__name">Coder's Hideoout</span>
+        <a class="brand__link" href="home.html" aria-label="Home">
+          <span class="brand__mark" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L21 7V17L12 22L3 17V7L12 2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+              <path d="M12 2V22M3 7L12 12L21 7M3 17L12 12L21 17" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" opacity="0.55"/>
+            </svg>
+          </span>
+          <span class="brand__name">TerraSentry</span>
+        </a>
 
         <div class="brand__actions">
           <button
@@ -76,7 +76,7 @@
           </button>
 
           <label class="lang-select" for="languageSelect">
-            <span class="sr-only">Language</span>
+            <span class="sr-only">Interface language</span>
             <select id="languageSelect">
               <option value="en" selected>English</option>
               <option value="hi">हिन्दी</option>
@@ -85,15 +85,24 @@
               <option value="bangali">বাংলা</option>
               <option value="telugu">తెలుగు</option>
               <option value="tamil">தமிழ்</option>
-              <option value="malyalam">വിവരങ്ങൾ</option>
+              <option value="malyalam">മലയാളം</option>
               <option value="gujrati">ગુજરાતી</option>
-              <option value="abc">abc</option>
-              <option value="pqr">pqr</option>
-              <option value="klm">klm</option>
-              <option value="efg">efg</option>
             </select>
           </label>
         </div>
+      </div>
+
+      <!-- Account type: determines which fields render below.
+           Officials get strict verification; citizens get a fast,
+           passwordless flow. -->
+      <div class="user-type" role="tablist" aria-label="Account type">
+        <button type="button" class="user-type__btn is-active" id="typeCitizen" role="tab" aria-selected="true" data-user-type="citizen">
+          Public / Citizen
+        </button>
+        <button type="button" class="user-type__btn" id="typeOfficial" role="tab" aria-selected="false" data-user-type="official">
+          Official / Institutional
+        </button>
+        <span class="user-type__indicator" id="userTypeIndicator" aria-hidden="true"></span>
       </div>
 
       <!-- Tab toggle: switches between Log In and Sign Up -->
@@ -109,60 +118,135 @@
 
           <!-- ============ LOG IN PANEL ============ -->
           <section class="panel" id="loginPanel" role="tabpanel" aria-labelledby="tabLogin">
-            <form id="loginForm" class="form" novalidate>
+            <form id="loginForm" class="form" novalidate data-step="1">
               <h1 class="form__title">Welcome back</h1>
-              <p class="form__subtitle">Log in to pick up right where you left off.</p>
+              <p class="form__subtitle citizen-only">No password needed — we'll text you a one-time code.</p>
+              <p class="form__subtitle official-only">Log in with your official credentials.</p>
 
-              <!-- Username or Email -->
-              <div class="field">
-                <label for="loginIdentifier">Username or email</label>
-                <div class="input-shell">
-                  <input
-                    type="text"
-                    id="loginIdentifier"
-                    name="identifier"
-                    autocomplete="username"
-                    placeholder="xyz_123 or xyz@email.com"
-                    required
-                  />
+              <!-- ---- STEP 1: credentials ---- -->
+              <div class="form-step" data-step-panel="1">
+
+                <!-- Citizen: mobile number only -->
+                <div class="field citizen-only">
+                  <label for="citizenLoginMobile">Mobile number</label>
+                  <div class="input-shell input-shell--prefix">
+                    <span class="input-prefix">+91</span>
+                    <input
+                      type="tel"
+                      id="citizenLoginMobile"
+                      name="mobile"
+                      inputmode="numeric"
+                      autocomplete="tel"
+                      placeholder="98XXX XXXXX"
+                      maxlength="10"
+                      required
+                    />
+                  </div>
+                  <p class="field__error" id="citizenLoginMobileError" role="alert"></p>
                 </div>
-                <p class="field__error" id="loginIdentifierError" role="alert"></p>
-              </div>
 
-              <!-- Password -->
-              <div class="field">
-                <label for="loginPassword">Password</label>
-                <div class="input-shell">
-                  <input
-                    type="password"
-                    id="loginPassword"
-                    name="password"
-                    autocomplete="current-password"
-                    placeholder="Enter your password"
-                    required
-                  />
-                  <button type="button" class="eye-toggle" data-target="loginPassword" aria-label="Show password" aria-pressed="false">
-                    <svg class="eye-open" width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/></svg>
-                    <svg class="eye-closed" width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" hidden><path d="M3 3l18 18M10.6 10.7a3 3 0 0 0 4.2 4.2M9.4 5.4A11 11 0 0 1 12 5c7 0 11 7 11 7a13.5 13.5 0 0 1-3.6 4.3M6.3 6.9C3.7 8.6 2 11 2 11a13.7 13.7 0 0 0 4.6 5.1A11 11 0 0 0 12 18c1 0 2-.15 2.9-.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  </button>
+                <!-- Official: email/username + password -->
+                <div class="field official-only">
+                  <label for="officialLoginIdentifier">Official email or username</label>
+                  <div class="input-shell">
+                    <input
+                      type="text"
+                      id="officialLoginIdentifier"
+                      name="identifier"
+                      autocomplete="username"
+                      placeholder="you@nic.in"
+                      required
+                    />
+                  </div>
+                  <p class="field__error" id="officialLoginIdentifierError" role="alert"></p>
                 </div>
-                <p class="field__error" id="loginPasswordError" role="alert"></p>
+
+                <div class="field official-only">
+                  <label for="officialLoginPassword">Password</label>
+                  <div class="input-shell">
+                    <input
+                      type="password"
+                      id="officialLoginPassword"
+                      name="password"
+                      autocomplete="current-password"
+                      placeholder="Enter your password"
+                      required
+                    />
+                    <button type="button" class="eye-toggle" data-target="officialLoginPassword" aria-label="Show password" aria-pressed="false">
+                      <svg class="eye-open" width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/></svg>
+                      <svg class="eye-closed" width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" hidden><path d="M3 3l18 18M10.6 10.7a3 3 0 0 0 4.2 4.2M9.4 5.4A11 11 0 0 1 12 5c7 0 11 7 11 7a13.5 13.5 0 0 1-3.6 4.3M6.3 6.9C3.7 8.6 2 11 2 11a13.7 13.7 0 0 0 4.6 5.1A11 11 0 0 0 12 18c1 0 2-.15 2.9-.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                  </div>
+                  <p class="field__error" id="officialLoginPasswordError" role="alert"></p>
+                </div>
+
+                <div class="form__row official-only">
+                  <label class="checkbox">
+                    <input type="checkbox" id="rememberMe" name="rememberMe" />
+                    <span class="checkbox__box" aria-hidden="true"></span>
+                    <span>Remember me</span>
+                  </label>
+                  <button type="button" class="link-btn" id="forgotPasswordBtn">Forgot password?</button>
+                </div>
+
+                <button type="submit" class="submit-btn" id="loginSubmit">
+                  <span class="submit-btn__label" id="loginSubmitLabel">Send OTP</span>
+                  <span class="submit-btn__spinner" aria-hidden="true"></span>
+                </button>
               </div>
 
-              <!-- Remember me + Forgot password -->
-              <div class="form__row">
-                <label class="checkbox">
-                  <input type="checkbox" id="rememberMe" name="rememberMe" />
-                  <span class="checkbox__box" aria-hidden="true"></span>
-                  <span>Remember me</span>
-                </label>
-                <button type="button" class="link-btn" id="forgotPasswordBtn">Forgot password?</button>
-              </div>
+              <!-- ---- STEP 2: OTP (citizen) / MFA (official) ---- -->
+              <div class="form-step" data-step-panel="2" hidden>
 
-              <button type="submit" class="submit-btn" id="loginSubmit">
-                <span class="submit-btn__label">Log In</span>
-                <span class="submit-btn__spinner" aria-hidden="true"></span>
-              </button>
+                <p class="otp-info citizen-only">
+                  Enter the 6-digit code sent to <strong>+91 <span id="citizenLoginMobileDisplay"></span></strong>
+                </p>
+                <p class="otp-info official-only">Multi-factor authentication is required for official accounts.</p>
+
+                <div class="radio-group official-only" role="radiogroup" aria-label="Verification method">
+                  <label class="radio">
+                    <input type="radio" name="loginMfaMethod" id="loginMfaOtp" value="otp" checked />
+                    <span class="radio__dot" aria-hidden="true"></span>
+                    <span>SMS / Email OTP</span>
+                  </label>
+                  <label class="radio">
+                    <input type="radio" name="loginMfaMethod" id="loginMfaTotp" value="totp" />
+                    <span class="radio__dot" aria-hidden="true"></span>
+                    <span>Authenticator app (TOTP)</span>
+                  </label>
+                </div>
+
+                <div class="field">
+                  <label for="loginOtp" id="loginOtpLabel">One-time code</label>
+                  <div class="input-shell">
+                    <input
+                      type="text"
+                      id="loginOtp"
+                      inputmode="numeric"
+                      autocomplete="one-time-code"
+                      maxlength="6"
+                      placeholder="••••••"
+                      class="otp-input"
+                      required
+                    />
+                  </div>
+                  <p class="field__error" id="loginOtpError" role="alert"></p>
+                </div>
+
+                <p class="resend-row" id="loginResendRow">
+                  <button type="button" class="link-btn" id="loginResendOtp">Resend code</button>
+                  <button type="button" class="link-btn" id="loginBackStep">← Back</button>
+                </p>
+
+                <p class="disclosure official-only">
+                  For security, we record your device, IP address, and approximate location at sign-in.
+                </p>
+
+                <button type="submit" class="submit-btn" id="loginVerifySubmit">
+                  <span class="submit-btn__label">Verify &amp; Log In</span>
+                  <span class="submit-btn__spinner" aria-hidden="true"></span>
+                </button>
+              </div>
 
               <p class="form__switch">
                 <span>Don't have an account?</span>
@@ -173,96 +257,301 @@
 
           <!-- ============ SIGN UP PANEL ============ -->
           <section class="panel" id="signupPanel" role="tabpanel" aria-labelledby="tabSignup">
-            <form id="signupForm" class="form" novalidate>
-              <h1 class="form__title">Create your account</h1>
-              <p class="form__subtitle">Takes less than a minute. No credit card needed.</p>
+            <form id="signupForm" class="form" novalidate data-step="1">
+              <h1 class="form__title citizen-only">Create your account</h1>
+              <h1 class="form__title official-only">Register your official account</h1>
+              <p class="form__subtitle citizen-only">Just your number — verified in seconds.</p>
+              
 
-              <!-- Username -->
-              <div class="field">
-                <label for="signupUsername">Username</label>
-                <div class="input-shell">
-                  <input
-                    type="text"
-                    id="signupUsername"
-                    name="username"
-                    autocomplete="username"
-                    placeholder="Choose a username"
-                    required
-                  />
+              <!-- ---- STEP 1: details ---- -->
+              <div class="form-step" data-step-panel="1">
+
+                <!-- ===== Citizen fields ===== -->
+                <div class="field citizen-only">
+                  <label for="citizenSignupMobile">Mobile number</label>
+                  <div class="input-shell input-shell--prefix">
+                    <span class="input-prefix">+91</span>
+                    <input
+                      type="tel"
+                      id="citizenSignupMobile"
+                      name="mobile"
+                      inputmode="numeric"
+                      autocomplete="tel"
+                      placeholder="98XXX XXXXX"
+                      maxlength="10"
+                      required
+                    />
+                  </div>
+                  <p class="field__hint">Your primary identifier — verified via SMS OTP.</p>
+                  <p class="field__error" id="citizenSignupMobileError" role="alert"></p>
                 </div>
-                <p class="field__hint">3–20 characters. Start with a letter — letters, numbers, and underscores only.</p>
-                <p class="field__error" id="signupUsernameError" role="alert"></p>
+
+                <div class="field citizen-only">
+                  <label for="citizenSignupName">Name <span class="field__optional">(optional)</span></label>
+                  <div class="input-shell">
+                    <input type="text" id="citizenSignupName" name="name" autocomplete="name" placeholder="Your name" />
+                  </div>
+                </div>
+
+                <div class="field citizen-only">
+                  <label for="citizenSignupPincode">Home location (PIN code)</label>
+                  <div class="input-shell">
+                    <input
+                      type="text"
+                      id="citizenSignupPincode"
+                      name="pincode"
+                      inputmode="numeric"
+                      autocomplete="postal-code"
+                      placeholder="e.g. 700001"
+                      maxlength="6"
+                      required
+                    />
+                  </div>
+                  <p class="field__hint">Used to send alerts localized to your area.</p>
+                  <p class="field__error" id="citizenSignupPincodeError" role="alert"></p>
+                </div>
+
+                <!-- ===== Official fields ===== -->
+                <div class="field official-only">
+                  <label for="officialSignupName">Full name</label>
+                  <div class="input-shell">
+                    <input type="text" id="officialSignupName" name="name" autocomplete="name" placeholder="Your full name" required />
+                  </div>
+                  <p class="field__error" id="officialSignupNameError" role="alert"></p>
+                </div>
+
+                <div class="field official-only">
+                  <label for="officialSignupDesignation">Designation</label>
+                  <div class="input-shell">
+                    <input type="text" id="officialSignupDesignation" name="designation" placeholder="e.g. District Disaster Management Officer" required />
+                  </div>
+                  <p class="field__error" id="officialSignupDesignationError" role="alert"></p>
+                </div>
+
+                <div class="field official-only">
+                  <label for="officialSignupEmail">Official email address</label>
+                  <div class="input-shell">
+                    <input type="email" id="officialSignupEmail" name="email" autocomplete="email" placeholder="you@gov.in" required />
+                  </div>
+                  <p class="field__hint">Must be an official @gov.in or @nic.in address.</p>
+                  <p class="field__error" id="officialSignupEmailError" role="alert"></p>
+                </div>
+
+                <div class="field official-only">
+                  <label for="officialSignupMobile">Official mobile number</label>
+                  <div class="input-shell input-shell--prefix">
+                    <span class="input-prefix">+91</span>
+                    <input
+                      type="tel"
+                      id="officialSignupMobile"
+                      name="mobile"
+                      inputmode="numeric"
+                      autocomplete="tel"
+                      placeholder="98XXX XXXXX"
+                      maxlength="10"
+                      required
+                    />
+                  </div>
+                  <p class="field__hint">Used for high-priority SMS alerts and 2FA/OTP.</p>
+                  <p class="field__error" id="officialSignupMobileError" role="alert"></p>
+                </div>
+
+                <div class="field official-only">
+                  <label for="officialSignupGovId">Government / Agency ID</label>
+                  <div class="input-shell">
+                    <input type="text" id="officialSignupGovId" name="govId" placeholder="Employee ID number" required />
+                  </div>
+                  <p class="field__error" id="officialSignupGovIdError" role="alert"></p>
+                </div>
+
+                <div class="field official-only">
+                  <label for="officialSignupIdProof">ID proof scan</label>
+                  <div class="file-shell">
+                    <input type="file" id="officialSignupIdProof" name="idProof" class="file-input" accept=".pdf,.jpg,.jpeg,.png" required />
+                    <label for="officialSignupIdProof" class="file-shell__btn">Choose file</label>
+                    <span class="file-shell__name" id="officialSignupIdProofName">No file chosen</span>
+                  </div>
+                  <p class="field__hint">Upload your employee ID or department authorization letter (PDF or image, max 5MB).</p>
+                  <p class="field__error" id="officialSignupIdProofError" role="alert"></p>
+                </div>
+
+                <fieldset class="field-group official-only">
+                  <legend>Assigned jurisdiction</legend>
+                  <div class="field-grid">
+                    <div class="field">
+                      <label for="officialSignupState">State / UT</label>
+                      <div class="input-shell">
+                        <select id="officialSignupState" name="state" required>
+                          <option value="" disabled selected>Select state</option>
+                          <option>Andhra Pradesh</option>
+                          <option>Arunachal Pradesh</option>
+                          <option>Assam</option>
+                          <option>Bihar</option>
+                          <option>Chhattisgarh</option>
+                          <option>Goa</option>
+                          <option>Gujarat</option>
+                          <option>Haryana</option>
+                          <option>Himachal Pradesh</option>
+                          <option>Jharkhand</option>
+                          <option>Karnataka</option>
+                          <option>Kerala</option>
+                          <option>Madhya Pradesh</option>
+                          <option>Maharashtra</option>
+                          <option>Manipur</option>
+                          <option>Meghalaya</option>
+                          <option>Mizoram</option>
+                          <option>Nagaland</option>
+                          <option>Odisha</option>
+                          <option>Punjab</option>
+                          <option>Rajasthan</option>
+                          <option>Sikkim</option>
+                          <option>Tamil Nadu</option>
+                          <option>Telangana</option>
+                          <option>Tripura</option>
+                          <option>Uttar Pradesh</option>
+                          <option>Uttarakhand</option>
+                          <option>West Bengal</option>
+                          <option>Andaman and Nicobar Islands</option>
+                          <option>Chandigarh</option>
+                          <option>Dadra and Nagar Haveli and Daman and Diu</option>
+                          <option>Delhi (NCT)</option>
+                          <option>Jammu and Kashmir</option>
+                          <option>Ladakh</option>
+                          <option>Lakshadweep</option>
+                          <option>Puducherry</option>
+                        </select>
+                      </div>
+                      <p class="field__error" id="officialSignupStateError" role="alert"></p>
+                    </div>
+
+                    <div class="field">
+                      <label for="officialSignupDistrict">District</label>
+                      <div class="input-shell">
+                        <input type="text" id="officialSignupDistrict" name="district" placeholder="e.g. Darjeeling" required />
+                      </div>
+                      <p class="field__error" id="officialSignupDistrictError" role="alert"></p>
+                    </div>
+
+                    <div class="field">
+                      <label for="officialSignupBlockCode">Block code</label>
+                      <div class="input-shell">
+                        <input type="text" id="officialSignupBlockCode" name="blockCode" placeholder="e.g. BLK-014" required />
+                      </div>
+                      <p class="field__error" id="officialSignupBlockCodeError" role="alert"></p>
+                    </div>
+                  </div>
+                  <p class="field__hint">Defines the H3 bounding box for the alerts you can issue.</p>
+                </fieldset>
+
+                <div class="field official-only">
+                  <label for="officialSignupDept">Department / Agency</label>
+                  <div class="input-shell">
+                    <select id="officialSignupDept" name="department" required>
+                      <option value="" disabled selected>Select department</option>
+                      <option value="ndrf">NDRF</option>
+                      <option value="bro">BRO</option>
+                      <option value="sdma">SDMA</option>
+                      <option value="police">Police</option>
+                      <option value="gsi">GSI</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                  <p class="field__error" id="officialSignupDeptError" role="alert"></p>
+                </div>
+
+                <div class="field official-only" id="officialSignupDeptOtherField" hidden>
+                  <label for="officialSignupDeptOther">Specify department</label>
+                  <div class="input-shell">
+                    <input type="text" id="officialSignupDeptOther" name="departmentOther" placeholder="Enter department name" />
+                  </div>
+                  <p class="field__error" id="officialSignupDeptOtherError" role="alert"></p>
+                </div>
+
+                <div class="field official-only">
+                  <label for="officialSignupPassword">Password</label>
+                  <div class="input-shell">
+                    <input
+                      type="password"
+                      id="officialSignupPassword"
+                      name="password"
+                      autocomplete="new-password"
+                      placeholder="Create a password"
+                      required
+                    />
+                    <button type="button" class="eye-toggle" data-target="officialSignupPassword" aria-label="Show password" aria-pressed="false">
+                      <svg class="eye-open" width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/></svg>
+                      <svg class="eye-closed" width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" hidden><path d="M3 3l18 18M10.6 10.7a3 3 0 0 0 4.2 4.2M9.4 5.4A11 11 0 0 1 12 5c7 0 11 7 11 7a13.5 13.5 0 0 1-3.6 4.3M6.3 6.9C3.7 8.6 2 11 2 11a13.7 13.7 0 0 0 4.6 5.1A11 11 0 0 0 12 18c1 0 2-.15 2.9-.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                  </div>
+
+                  <div class="strength" id="strengthMeter" aria-hidden="true">
+                    <span class="strength__bar"><i></i></span>
+                    <span class="strength__bar"><i></i></span>
+                    <span class="strength__bar"><i></i></span>
+                  </div>
+                  <p class="strength__label" id="strengthLabel"></p>
+
+                  <p class="field__error" id="officialSignupPasswordError" role="alert"></p>
+                </div>
+
+                <div class="field official-only">
+                  <label for="officialSignupConfirmPassword">Confirm password</label>
+                  <div class="input-shell">
+                    <input
+                      type="password"
+                      id="officialSignupConfirmPassword"
+                      name="confirmPassword"
+                      autocomplete="new-password"
+                      placeholder="Re-enter your password"
+                      required
+                    />
+                    <button type="button" class="eye-toggle" data-target="officialSignupConfirmPassword" aria-label="Show password" aria-pressed="false">
+                      <svg class="eye-open" width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/></svg>
+                      <svg class="eye-closed" width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" hidden><path d="M3 3l18 18M10.6 10.7a3 3 0 0 0 4.2 4.2M9.4 5.4A11 11 0 0 1 12 5c7 0 11 7 11 7a13.5 13.5 0 0 1-3.6 4.3M6.3 6.9C3.7 8.6 2 11 2 11a13.7 13.7 0 0 0 4.6 5.1A11 11 0 0 0 12 18c1 0 2-.15 2.9-.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                  </div>
+                  <p class="field__error" id="officialSignupConfirmPasswordError" role="alert"></p>
+                </div>
+
+                <button type="submit" class="submit-btn" id="signupSubmit">
+                  <span class="submit-btn__label" id="signupSubmitLabel">Send OTP</span>
+                  <span class="submit-btn__spinner" aria-hidden="true"></span>
+                </button>
               </div>
 
-              <!-- Email -->
-              <div class="field">
-                <label for="signupEmail">Email address</label>
-                <div class="input-shell">
-                  <input
-                    type="email"
-                    id="signupEmail"
-                    name="email"
-                    autocomplete="email"
-                    placeholder="you@email.com"
-                    required
-                  />
+              <!-- ---- STEP 2: OTP (citizen only — official goes straight to review) ---- -->
+              <div class="form-step citizen-only" data-step-panel="2" hidden>
+                <p class="otp-info">
+                  Enter the 6-digit code sent to <strong>+91 <span id="citizenSignupMobileDisplay"></span></strong>
+                </p>
+
+                <div class="field">
+                  <label for="citizenSignupOtp">One-time code</label>
+                  <div class="input-shell">
+                    <input
+                      type="text"
+                      id="citizenSignupOtp"
+                      inputmode="numeric"
+                      autocomplete="one-time-code"
+                      maxlength="6"
+                      placeholder="••••••"
+                      class="otp-input"
+                      required
+                    />
+                  </div>
+                  <p class="field__error" id="citizenSignupOtpError" role="alert"></p>
                 </div>
-                <p class="field__error" id="signupEmailError" role="alert"></p>
+
+                <p class="resend-row">
+                  <button type="button" class="link-btn" id="signupResendOtp">Resend code</button>
+                  <button type="button" class="link-btn" id="signupBackStep">← Back</button>
+                </p>
+
+                <button type="submit" class="submit-btn" id="signupVerifySubmit">
+                  <span class="submit-btn__label">Verify &amp; Create Account</span>
+                  <span class="submit-btn__spinner" aria-hidden="true"></span>
+                </button>
               </div>
-
-              <!-- Password -->
-              <div class="field">
-                <label for="signupPassword">Password</label>
-                <div class="input-shell">
-                  <input
-                    type="password"
-                    id="signupPassword"
-                    name="password"
-                    autocomplete="new-password"
-                    placeholder="Create a password"
-                    required
-                  />
-                  <button type="button" class="eye-toggle" data-target="signupPassword" aria-label="Show password" aria-pressed="false">
-                    <svg class="eye-open" width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/></svg>
-                    <svg class="eye-closed" width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" hidden><path d="M3 3l18 18M10.6 10.7a3 3 0 0 0 4.2 4.2M9.4 5.4A11 11 0 0 1 12 5c7 0 11 7 11 7a13.5 13.5 0 0 1-3.6 4.3M6.3 6.9C3.7 8.6 2 11 2 11a13.7 13.7 0 0 0 4.6 5.1A11 11 0 0 0 12 18c1 0 2-.15 2.9-.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  </button>
-                </div>
-
-                <!-- Password strength meter -->
-                <div class="strength" id="strengthMeter" aria-hidden="true">
-                  <span class="strength__bar"><i></i></span>
-                  <span class="strength__bar"><i></i></span>
-                  <span class="strength__bar"><i></i></span>
-                </div>
-                <p class="strength__label" id="strengthLabel"></p>
-
-                <p class="field__error" id="signupPasswordError" role="alert"></p>
-              </div>
-
-              <!-- Confirm Password -->
-              <div class="field">
-                <label for="signupConfirmPassword">Confirm password</label>
-                <div class="input-shell">
-                  <input
-                    type="password"
-                    id="signupConfirmPassword"
-                    name="confirmPassword"
-                    autocomplete="new-password"
-                    placeholder="Re-enter your password"
-                    required
-                  />
-                  <button type="button" class="eye-toggle" data-target="signupConfirmPassword" aria-label="Show password" aria-pressed="false">
-                    <svg class="eye-open" width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/></svg>
-                    <svg class="eye-closed" width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" hidden><path d="M3 3l18 18M10.6 10.7a3 3 0 0 0 4.2 4.2M9.4 5.4A11 11 0 0 1 12 5c7 0 11 7 11 7a13.5 13.5 0 0 1-3.6 4.3M6.3 6.9C3.7 8.6 2 11 2 11a13.7 13.7 0 0 0 4.6 5.1A11 11 0 0 0 12 18c1 0 2-.15 2.9-.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  </button>
-                </div>
-                <p class="field__error" id="signupConfirmPasswordError" role="alert"></p>
-              </div>
-
-              <button type="submit" class="submit-btn" id="signupSubmit">
-                <span class="submit-btn__label">Create Account</span>
-                <span class="submit-btn__spinner" aria-hidden="true"></span>
-              </button>
 
               <p class="form__switch">
                 <span>Already have an account?</span>
@@ -271,21 +560,21 @@
             </form>
           </section>
 
-          <!-- ============ FORGOT PASSWORD PANEL ============ -->
+          <!-- ============ FORGOT PASSWORD PANEL (official accounts) ============ -->
           <section class="panel" id="forgotPanel" role="tabpanel" aria-labelledby="forgotPasswordBtn">
             <form id="forgotForm" class="form" novalidate>
               <h1 class="form__title">Reset your password</h1>
-              <p class="form__subtitle">Enter your email and we'll send a reset link.</p>
+              <p class="form__subtitle">For official accounts. Enter your official email and we'll send a reset link.</p>
 
               <div class="field">
-                <label for="forgotEmail">Email address</label>
+                <label for="forgotEmail">Official email address</label>
                 <div class="input-shell">
                   <input
                     type="email"
                     id="forgotEmail"
                     name="forgotEmail"
                     autocomplete="email"
-                    placeholder="you@email.com"
+                    placeholder="you@gov.in"
                     required
                   />
                 </div>

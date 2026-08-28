@@ -1,3 +1,4 @@
+import os
 class Config:
     '''configuration object that stores static config variables used by the microservice.
     Loaded from environment variables on startup.'''
@@ -33,4 +34,5 @@ class Config:
         self.smtp_username:str =None
         self.smtp_password:str=None
         self.smtp_address_from:str = None
+
         

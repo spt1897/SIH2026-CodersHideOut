@@ -37,7 +37,7 @@ public class GatewayRoutingConfig {
     public RouteLocator routeLocator(RouteLocatorBuilder builder) {
         return builder.routes()
             .route("auth-service-dynamic", r -> r
-                .path("/user/**")
+                .path("/auth/**")
                 .filters(f -> f 
                     .filter(filter.apply(new ApiKeyFilter.Config()))
                     .requestRateLimiter(c -> c

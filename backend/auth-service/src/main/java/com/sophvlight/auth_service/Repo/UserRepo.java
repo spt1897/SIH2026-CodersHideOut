@@ -13,11 +13,13 @@ import io.lettuce.core.dynamic.annotation.Param;
 public interface UserRepo extends JpaRepository<Users,Integer> {
     Users findByEmail(String email);
 
-    Users findByUsername(String username);
+    // Users findByUsername(String username);
 
-    @Query("SELECT u.id FROM Users u WHERE u.username IN :usernames")
-    Set<Integer> fetchAllIdsByUsernames(@Param("usernames") Set<String> usernames);
+    Users findByPhno(String phno);
 
-    @Query("SELECT u.username FROM Users u WHERE u.id IN :ids")
-    Set<String> fetchAllUsernamesByIds(@Param("ids") Set<Integer> ids);
+    // @Query("SELECT u.id FROM Users u WHERE u.username IN :usernames")
+    // Set<Integer> fetchAllIdsByUsernames(@Param("usernames") Set<String> usernames);
+
+    // @Query("SELECT u.username FROM Users u WHERE u.id IN :ids")
+    // Set<String> fetchAllUsernamesByIds(@Param("ids") Set<Integer> ids);
 }

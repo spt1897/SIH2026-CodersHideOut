@@ -15,6 +15,13 @@ services:
       retries: 5
     # env_file: 
     #   - ./backend/eurekaserver/.env
+  
+  #Redis Cache Service
+  redis-cache:
+    image: redis:7-alpine
+    container_name: redis-cache
+    ports:
+      - "6379:6379"
 
   # 2. The API Gateway
   api-gateway:
@@ -25,6 +32,8 @@ services:
     depends_on:
       eureka-server:
         condition: service_started
+    env_file:                           
+      - ./backend/auth-service/.env
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
       - SERVER_PORT=8181

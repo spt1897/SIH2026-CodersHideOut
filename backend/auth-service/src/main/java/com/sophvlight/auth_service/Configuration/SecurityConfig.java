@@ -1,12 +1,10 @@
 package com.sophvlight.auth_service.Configuration;
 
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -25,31 +23,29 @@ import com.sophvlight.auth_service.Standards.Links;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    private JWTFilter jwtfilter;
-    private DelegatedAuthenticationEntryPoint authEntryPoint;
+    private final JWTFilter jwtfilter;
+    private final DelegatedAuthenticationEntryPoint authEntryPoint;
+    private final UserService userService;
+
     @Autowired
-    public SecurityConfig(JWTFilter jwtfilter,DelegatedAuthenticationEntryPoint authEntryPoint) {
+    public SecurityConfig(JWTFilter jwtfilter, DelegatedAuthenticationEntryPoint authEntryPoint, UserService userService) {
         this.jwtfilter = jwtfilter;
-        this.authEntryPoint=authEntryPoint;
+        this.authEntryPoint = authEntryPoint;
+        this.userService = userService;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception  {
         return http
-                .formLogin(e -> e.disable())
-                .csrf(c -> c.disable())
-                .oauth2Client(o->o.disable())
-                .oauth2Login(o->o.disable())
-                .cors(Customizer.withDefaults())
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.disable())
                 .exceptionHandling(e -> e.authenticationEntryPoint(authEntryPoint))
-                .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(c -> c
-                        .requestMatchers(HttpMethod.OPTIONS, "/**")
-                        .permitAll()
-                        .requestMatchers(
-                                Links.PUBLIC_ENDPOINTS)
-                        .permitAll()
-                        .anyRequest().authenticated())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(Links.PUBLIC_ENDPOINTS).permitAll()
+                        .anyRequest().authenticated()
+                )
+                .authenticationProvider(authenticationProvider(userService))
                 .addFilterBefore(jwtfilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
@@ -67,7 +63,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 }

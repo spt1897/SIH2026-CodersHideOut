@@ -2,9 +2,10 @@ package com.sophvlight.auth_service.Standards;
 
 public class Links {
     public static final String[] PUBLIC_ENDPOINTS = {
-            "/user/register",
-            "/user/login",
-            "/user/refresh",
+            "/auth/register/public",
+            "/auth/register/admin",
+            "/auth/login",
+            "/auth/refresh",
             "/error",
             "/v3/api-docs/**",
             "/swagger-ui/**",
@@ -12,6 +13,7 @@ public class Links {
             "/swagger-resources/**",
             "/webjars/**",
             "/ws-chat/**",
-            "/home/**"
+            "/home/**",
+            "/auth/oauth"
     };
 }

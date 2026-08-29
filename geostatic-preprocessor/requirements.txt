@@ -26,3 +26,19 @@ aiofiles==25.1.0
 weasyprint==69.0
 jinja2==3.1.6
 pyngrok==8.1.2
+
+#server specific
+geopandas==1.1.4
+rasterio==1.5.1
+numpy==2.5.2
+scipy==1.18.1
+ee==0.2
+earthaccess==0.18.0
+shapely==2.1.2
+pyogrio==0.13.0
+numpy==2.5.2
+pandas==3.0.5
+pyproj==3.7.2
+pyrosm==0.13.1
+h3==4.5.0
+geopy==2.5.0

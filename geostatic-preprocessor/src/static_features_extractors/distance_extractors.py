@@ -2,16 +2,18 @@ import math
 import os
 from typing import Dict, List, Tuple
 import geopandas as gpd
+import pandas as pd
 
 from src.static_features_extractors.raster_file_config import VECTOR_PATHS
 
 
 def get_vector_distances_batch(
-    vector_key: str, coords: List[Tuple[float, float]], bbox: Tuple[float, float, float, float]
+    vector_key: str, 
+    coords: List[Tuple[float, float]], 
+    bbox: Tuple[float, float, float, float] = None
 ) -> Dict[Tuple[float, float], float]:
     """Crops a vector dataset to the specified bounding box (min_lat, min_lon, max_lat, max_lon)
-
-    and computes the minimum distance in meters to nearest feature for all points.
+    and computes the minimum distance in meters to nearest feature for all points using R-Tree spatial indexes.
     """
     results = {pt: 0.0 for pt in coords}
     path = VECTOR_PATHS.get(vector_key)
@@ -19,29 +21,51 @@ def get_vector_distances_batch(
     if not path or not os.path.exists(path) or not coords:
         return results
 
+    # Compute bbox from coords if not passed
+    if bbox is None:
+        lats = [c[0] for c in coords]
+        lons = [c[1] for c in coords]
+        bbox = (min(lats), min(lons), max(lats), max(lons))
+
     try:
         min_lat, min_lon, max_lat, max_lon = bbox
         
-        # Read vector file filtered by bounding box (EPSG:4326)
-        gdf = gpd.read_file(path, bbox=(min_lon, min_lat, max_lon, max_lat))
+        # Buffer bbox slightly (0.05 deg ~ 5km) so nearby roads outside bbox aren't missed
+        pad = 0.05
+        gdf = gpd.read_file(
+            path, 
+            bbox=(min_lon - pad, min_lat - pad, max_lon + pad, max_lat + pad)
+        )
         if gdf.empty:
             return results
 
-        # Project to planar CRS for accurate metric distance (EPSG:3857)
+        # Reproject both vector data and points to metric planar projection (EPSG:3857)
         gdf = gdf.to_crs(epsg=3857)
 
-        # Convert coords into GeoDataFrame
         pts_gdf = gpd.GeoDataFrame(
+            {"coord": coords},
             geometry=gpd.points_from_xy(
-                [lon for lat, lon in coords], [lat for lat, lon in coords]
+                [lon for _, lon in coords], 
+                [lat for lat, _ in coords]
             ),
             crs="EPSG:4326",
         ).to_crs(epsg=3857)
 
-        # Compute nearest spatial distances using R-Tree index
-        for (lat, lon), pt_geom in zip(coords, pts_gdf.geometry):
-            min_dist = gdf.distance(pt_geom).min()
-            results[(lat, lon)] = float(min_dist)
+        # -------------------------------------------------------------
+        # FAST: STRtree Vectorized Nearest Neighbor Search
+        # -------------------------------------------------------------
+        nearest = gpd.sjoin_nearest(
+            pts_gdf, 
+            gdf[['geometry']], 
+            how="left", 
+            distance_col="dist_m"
+        )
+
+        # Map computed distance back to coordinate dict
+        for _, row in nearest.iterrows():
+            pt = row["coord"]
+            if pd.notna(row["dist_m"]):
+                results[pt] = float(row["dist_m"])
 
     except Exception as e:
         print(f"Error calculating distances for {vector_key}: {e}")
@@ -50,19 +74,22 @@ def get_vector_distances_batch(
 
 
 def get_distance_to_fault_batch(
-    coords: List[Tuple[float, float]], bbox: Tuple[float, float, float, float]
+    coords: List[Tuple[float, float]], 
+    bbox: Tuple[float, float, float, float] = None
 ) -> Dict[Tuple[float, float], float]:
     return get_vector_distances_batch("faults", coords, bbox)
 
 
 def get_distance_to_road_batch(
-    coords: List[Tuple[float, float]], bbox: Tuple[float, float, float, float]
+    coords: List[Tuple[float, float]], 
+    bbox: Tuple[float, float, float, float] = None
 ) -> Dict[Tuple[float, float], float]:
     return get_vector_distances_batch("roads", coords, bbox)
 
 
 def get_distance_to_river_batch(
-    coords: List[Tuple[float, float]], bbox: Tuple[float, float, float, float]
+    coords: List[Tuple[float, float]], 
+    bbox: Tuple[float, float, float, float] = None
 ) -> Dict[Tuple[float, float], float]:
     d1 = get_vector_distances_batch("waterways", coords, bbox)
     d2 = get_vector_distances_batch("water_bodies", coords, bbox)
@@ -76,7 +103,7 @@ def get_distance_to_river_batch(
 def get_density_metrics_batch(
     vector_key: str,
     coords: List[Tuple[float, float]],
-    bbox: Tuple[float, float, float, float],
+    bbox: Tuple[float, float, float, float] = None,
     search_radius_m: float = 2000.0,
     is_length: bool = False,
 ) -> Dict[Tuple[float, float], float]:
@@ -87,10 +114,14 @@ def get_density_metrics_batch(
     if not path or not os.path.exists(path) or not coords:
         return results
 
+    if bbox is None:
+        lats = [c[0] for c in coords]
+        lons = [c[1] for c in coords]
+        bbox = (min(lats), min(lons), max(lats), max(lons))
+
     try:
         min_lat, min_lon, max_lat, max_lon = bbox
         
-        # Buffer bounding box to prevent clipping features near borders
         gdf = gpd.read_file(path, bbox=(min_lon - 0.05, min_lat - 0.05, max_lon + 0.05, max_lat + 0.05))
         if gdf.empty:
             return results
@@ -99,25 +130,34 @@ def get_density_metrics_batch(
         area_km2 = math.pi * (search_radius_m / 1000.0) ** 2
 
         pts_gdf = gpd.GeoDataFrame(
+            {"coord": coords},
             geometry=gpd.points_from_xy(
-                [lon for lat, lon in coords], [lat for lat, lon in coords]
+                [lon for _, lon in coords], 
+                [lat for lat, _ in coords]
             ),
             crs="EPSG:4326",
         ).to_crs(epsg=3857)
 
-        for (lat, lon), pt_geom in zip(coords, pts_gdf.geometry):
-            buffer_zone = pt_geom.buffer(search_radius_m)
-            clipped = gdf.clip(buffer_zone)
+        # Buffer points once in planar projection
+        pts_gdf["buffer"] = pts_gdf.geometry.buffer(search_radius_m)
+        buffers_gdf = pts_gdf.set_geometry("buffer")
 
-            if clipped.empty:
-                results[(lat, lon)] = 0.0
-            elif is_length:
-                # Drainage density (km / km²)
-                total_len_km = clipped.geometry.length.sum() / 1000.0
-                results[(lat, lon)] = float(total_len_km / area_km2)
-            else:
-                # Building density (count / km²)
-                results[(lat, lon)] = float(len(clipped) / area_km2)
+        # Spatial Join Buffer with GDF features
+        joined = gpd.sjoin(gdf, buffers_gdf, how="inner", predicate="intersects")
+
+        if is_length:
+            # Clip geometries for exact length inside buffer
+            for pt, group in joined.groupby("coord"):
+                pt_geom = pts_gdf.loc[pts_gdf["coord"] == pt, "geometry"].values[0]
+                buf = pt_geom.buffer(search_radius_m)
+                clipped = group.geometry.clip(buf)
+                total_len_km = clipped.length.sum() / 1000.0
+                results[pt] = float(total_len_km / area_km2)
+        else:
+            # Building count density
+            counts = joined.groupby("coord").size()
+            for pt, count in counts.items():
+                results[pt] = float(count / area_km2)
 
     except Exception as e:
         print(f"Error computing density for {vector_key}: {e}")
@@ -126,16 +166,14 @@ def get_density_metrics_batch(
 
 
 def get_drainage_density_batch(
-    coords: List[Tuple[float, float]], bbox: Tuple[float, float, float, float]
+    coords: List[Tuple[float, float]], 
+    bbox: Tuple[float, float, float, float] = None
 ) -> Dict[Tuple[float, float], float]:
-    return get_density_metrics_batch(
-        "waterways", coords, bbox, is_length=True
-    )
+    return get_density_metrics_batch("waterways", coords, bbox, is_length=True)
 
 
 def get_building_density_batch(
-    coords: List[Tuple[float, float]], bbox: Tuple[float, float, float, float]
+    coords: List[Tuple[float, float]], 
+    bbox: Tuple[float, float, float, float] = None
 ) -> Dict[Tuple[float, float], float]:
-    return get_density_metrics_batch(
-        "buildings", coords, bbox, is_length=False
-    )
+    return get_density_metrics_batch("buildings", coords, bbox, is_length=False)

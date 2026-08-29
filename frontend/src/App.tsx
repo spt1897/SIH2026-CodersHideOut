@@ -1,9 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
-// Import all your actual pages (Overriding your teammate's mock components)
-import LandingPage from './pages/LandingPage';
-import LoginPage from './pages/Auth/LoginForm';
-import SignupPage from './pages/Auth/SignupPage';
+// Import the newly translated UI components
+import HomePage from './pages/HomePage';
+import AuthPage from './pages/Auth/AuthPage';
+
+// Import your existing dashboards
 import DashboardPage from './pages/Dashboard/DashboardPage';
 import AdminDashboard from './pages/AdminDashboard';
 
@@ -14,9 +15,10 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
+        {/* Point the root and auth routes to our new components */}
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<AuthPage />} />
+        <Route path="/signup" element={<AuthPage />} /> {/* AuthPage handles both via tabs */}
 
         {/* Teammate's protected route logic (ready for later) */}
         {/* <Route

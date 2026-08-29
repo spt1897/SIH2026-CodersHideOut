@@ -122,7 +122,7 @@ export default function DisasterMap({ riskData }: DisasterMapProps) {
 
 
   return (
-    <div className="relative w-full h-[600px] rounded-lg overflow-hidden border border-[#262626]">
+    <div className="relative w-full h-full md:rounded-lg overflow-hidden md:border border-[#262626]">
       <div ref={mapContainer} className="w-full h-full" />
 
       {/* Floating Theme Toggle (Always Accessible) */}

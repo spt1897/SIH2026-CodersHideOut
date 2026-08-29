@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import DisasterMap from '../components/DisasterMap';
+import DisasterMap from '../components/DisasterMap'; // Verify this path matches your directory
 import NotificationToggle from '../components/common/NotificationToggle';
 
 export default function AdminDashboard() {
@@ -22,7 +22,7 @@ export default function AdminDashboard() {
       features: [
         {
           type: 'Feature' as const,
-          properties: { riskLevel: 'HIGH' },
+          properties: { riskLevel: 'HIGH', score: 92, state: 'Critical', alert: 'Evacuate' }, // Added properties to match your map's step colors
           geometry: {
             type: 'Polygon' as const,
             coordinates: [
@@ -43,64 +43,67 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div style={{ display: 'flex', height: '100vh', width: '100vw', backgroundColor: '#050505', color: '#e5e7eb', overflow: 'hidden' }}>
+    // Responsive outer container: Column on mobile, Row on desktop
+    <div className="flex flex-col md:flex-row h-screen w-full bg-[#050505] text-gray-200 overflow-hidden">
       
-      {/* LEFT SIDEBAR */}
-      <aside style={{ width: '380px', backgroundColor: '#0a0a0a', borderRight: '1px solid #1f2937', display: 'flex', flexDirection: 'column', padding: '24px', zIndex: 10 }}>
+      {/* LEFT SIDEBAR -> BOTTOM PANEL ON MOBILE */}
+      <aside className="w-full md:w-[380px] h-[45vh] md:h-full overflow-y-auto bg-[#0a0a0a] border-t md:border-t-0 md:border-r border-gray-800 p-6 flex flex-col z-10 shrink-0 order-2 md:order-1">
         
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+        <div className="flex justify-between items-center mb-8 shrink-0">
           <div>
-            <p style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#60a5fa', marginBottom: '8px' }}>
+            <p className="text-xs uppercase tracking-widest text-blue-400 mb-2">
               ● LIVE MONITORING
             </p>
-            <h1 style={{ fontSize: '24px', fontWeight: 'bold', margin: 0 }}>Kamrup District</h1>
+            <h1 className="text-2xl font-bold m-0 text-white">Kamrup District</h1>
           </div>
           
           {/* SIMULATION BUTTON */}
           <button 
             onClick={triggerLiveAlert}
-            style={{ backgroundColor: '#1f2937', color: 'white', border: 'none', padding: '8px 12px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer' }}
+            className="bg-gray-800 text-white border border-gray-700 py-2 px-3 rounded-md text-xs cursor-pointer hover:bg-gray-700 transition-colors"
           >
             Simulate Alert
           </button>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '32px' }}>
-          <div style={{ backgroundColor: '#171717', padding: '16px', borderRadius: '8px', border: '1px solid #262626' }}>
-            <span style={{ display: 'block', fontSize: '12px', color: '#9ca3af' }}>Avg Soil Moisture</span>
-            <span style={{ display: 'block', fontSize: '24px', fontWeight: 'bold', color: activeAlert ? '#ef4444' : '#3b82f6', marginTop: '4px' }}>
+        <div className="grid grid-cols-2 gap-4 mb-8 shrink-0">
+          <div className="bg-[#171717] p-4 rounded-lg border border-[#262626]">
+            <span className="block text-xs text-gray-400">Avg Soil Moisture</span>
+            <span className={`block text-2xl font-bold mt-1 ${activeAlert ? 'text-red-500' : 'text-blue-500'}`}>
               {activeAlert ? activeAlert.moisture : '68%'}
             </span>
           </div>
-          <div style={{ backgroundColor: '#171717', padding: '16px', borderRadius: '8px', border: '1px solid #262626' }}>
-            <span style={{ display: 'block', fontSize: '12px', color: '#9ca3af' }}>24h Rainfall</span>
-            <span style={{ display: 'block', fontSize: '24px', fontWeight: 'bold', color: '#3b82f6', marginTop: '4px' }}>142mm</span>
+          <div className="bg-[#171717] p-4 rounded-lg border border-[#262626]">
+            <span className="block text-xs text-gray-400">24h Rainfall</span>
+            <span className="block text-2xl font-bold text-blue-500 mt-1">142mm</span>
           </div>
         </div>
 
         {/* Dynamic Alerts List */}
-        <div>
-          <h2 style={{ fontSize: '14px', fontWeight: '600', color: '#d1d5db', marginBottom: '16px', borderBottom: '1px solid #262626', paddingBottom: '8px' }}>
+        <div className="mb-8 shrink-0">
+          <h2 className="text-sm font-semibold text-gray-300 mb-4 border-b border-[#262626] pb-2">
             Active AI Predictions
           </h2>
           
           {activeAlert ? (
-            <div style={{ backgroundColor: '#450a0a', borderLeft: '4px solid #ef4444', padding: '12px 16px', borderRadius: '4px', animation: 'pulse 2s infinite' }}>
-              <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#f87171' }}>HIGH RISK - H3: {activeAlert.h3Index}</span>
-              <p style={{ fontSize: '13px', color: '#fca5a5', marginTop: '4px', margin: 0 }}>{activeAlert.message} Landslide probability: {activeAlert.risk}.</p>
+            <div className="bg-[#450a0a] border-l-4 border-red-500 p-3 rounded shadow-md animate-pulse">
+              <span className="text-xs font-bold text-red-400">HIGH RISK - H3: {activeAlert.h3Index}</span>
+              <p className="text-[13px] text-red-300 mt-1 m-0">{activeAlert.message} Landslide probability: {activeAlert.risk}.</p>
             </div>
           ) : (
-            <p style={{ fontSize: '13px', color: '#6b7280' }}>Waiting for telemetry data...</p>
+            <p className="text-[13px] text-gray-500">Waiting for telemetry data...</p>
           )}
         </div>
 
         {/* Firebase Notification Widget */}
-        <NotificationToggle />
+        <div className="mt-auto pt-4 shrink-0">
+          <NotificationToggle />
+        </div>
         
       </aside>
 
-      {/* MAIN CONTENT */}
-      <main style={{ flex: 1, position: 'relative' }}>
+      {/* MAIN CONTENT -> TOP PANEL ON MOBILE */}
+      <main className="flex-1 w-full h-[55vh] md:h-full relative order-1 md:order-2">
         <DisasterMap riskData={mapData} />
       </main>
 

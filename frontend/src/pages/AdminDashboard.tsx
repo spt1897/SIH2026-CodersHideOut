@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import DisasterMap from '../components/DisasterMap';
+import NotificationToggle from '../components/common/NotificationToggle';
 
 export default function AdminDashboard() {
   const [activeAlert, setActiveAlert] = useState<any>(null);
@@ -92,6 +93,10 @@ export default function AdminDashboard() {
             <p style={{ fontSize: '13px', color: '#6b7280' }}>Waiting for telemetry data...</p>
           )}
         </div>
+
+        {/* Firebase Notification Widget */}
+        <NotificationToggle />
+        
       </aside>
 
       {/* MAIN CONTENT */}

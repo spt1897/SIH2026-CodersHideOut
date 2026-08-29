@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 // Import all your actual pages (Overriding your teammate's mock components)
 import LandingPage from './pages/LandingPage';
-import LoginPage from './pages/Auth/LoginPage';
+import LoginPage from './pages/Auth/LoginForm';
 import SignupPage from './pages/Auth/SignupPage';
 import DashboardPage from './pages/Dashboard/DashboardPage';
 import AdminDashboard from './pages/AdminDashboard';

@@ -33,7 +33,7 @@ build/
 .vscode/
 
 .env
-
+env/
 setenv.bat
 
 *.json

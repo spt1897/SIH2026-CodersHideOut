@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: api-gateway
+  data:
+    redis:
+      host: redis-cache
+      port: 6379
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true 
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: 
+              - "http://localhost:3000"
+              - "http://localhost:5173"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+
+server:
+  port: 8181
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+
+cache:
+  burst-capacity: 10
+  replenish-rate: 10
+
+software:
+  jwt:
+    access:
+      secret: ${JWT_ACCESS_SECRET}
+      life: ${JWT_ACCESS_LIFE}

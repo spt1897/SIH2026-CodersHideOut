@@ -8,6 +8,9 @@ from src.core.server_manager.appstate import init_appstate
 from fastapi import FastAPI
 from typing import Callable
 import time
+from src.synchronizer.load_db_to_cache import load_db_to_cache
+from src.event.create_consumer import create_consumer
+from src.synchronizer.syncers import *
 '''
 This file manages the lifespan(initiialization and deinitialisation) of the server.
 Sets up the server by connecting to DB,cache,and registering to Eureka on startup
@@ -22,17 +25,25 @@ async def init_server(app: FastAPI,process_pool_init:Callable=None,args:tuple[()
     await connectRedis(app)
     #initialise other app state variables
     await init_appstate(app,process_pool_init,args)
-    #register to eureka now
+    #server_specific_init:
+    await load_db_to_cache(app)
+    await create_consumer(app)
+    await start_syncers(app)
+    #register to eureka now (after all other inits)
     await register_service(app)
-   
+
 
 
 async def deinit_server(app: FastAPI):
-    #deregister from eureka first
+    #deregister from eureka first (before all other deinits)
     await deregister_service(app)
+    #server specific:
+    await stop_syncers(app)
     #disconnect from DB and redis
     await disconnectDB(app)
     await disconnectRedis(app)
+    
+    
 
 
 def lifespan(process_pool_init:Callable=None,args:tuple[()]=None):

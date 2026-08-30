@@ -1,4 +1,4 @@
-version: '3.8'
+# version: '3.8'
 
 services:
 
@@ -56,6 +56,23 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+  
+  user-db:
+    image: postgres:latest
+    container_name: user-db
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: user_db
+    ports:
+      - "5422:5432"
+    volumes:
+      - user_db_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-postgres} -d user_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # 4. The Auth Microservice
   auth-service:
@@ -76,6 +93,24 @@ services:
       - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD:-postgres}
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
       - SERVER_PORT=8090
+  
+  user-service:
+    build: ./backend/userservice
+    container_name: user-service
+    ports:
+      - "8070:8070"
+    depends_on:
+      user-db:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+    env_file: 
+      - ./backend/userservice/.env
+    environment:
+      - DB_URL=postgresql://${DB_USERNAME:-postgres}:${DB_PASSWORD:-postgres}@user-db:5432/user_db
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka
+      - SERVER_PORT=8070
 
 volumes:
   auth_db_data:
+  user_db_data:

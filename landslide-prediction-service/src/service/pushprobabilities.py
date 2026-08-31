@@ -19,7 +19,7 @@ async def pushprobabilities(h3_indexes,probabilities,app):
     async def streamtoredis(redis_client:redis.Redis):
         pipe = redis_client.pipeline()
         for landslide_cell in landslide_cells:
-            pipe.xadd( "landslide_cells",landslide_cell)
+            pipe.xadd( "predicted_landslide_cells",landslide_cell)
         for cell in allcells:
             pipe.xadd("h3_predictions", cell)
         await pipe.execute()

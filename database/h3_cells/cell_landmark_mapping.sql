@@ -21,6 +21,8 @@ CREATE TABLE IF NOT EXISTS cell_landmark_mapping (
 
     -- LAND USE & LANDMARKS
     is_farmland BOOLEAN NOT NULL DEFAULT FALSE,
+    has_NH BOOLEAN NOT NULL DEFAULT FALSE,
+    has_SH BOOLEAN NOT NULL DEFAULT FALSE,
     agricultural_centroids GEOMETRY(MultiPoint, 4326),
     population_density FLOAT NOT NULL DEFAULT 0,
     estimated_population INT NOT NULL DEFAULT 0,

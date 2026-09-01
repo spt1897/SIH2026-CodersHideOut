@@ -311,6 +311,31 @@ def cell_landmark_mapper(
         road_matches = spatial_intersect(osm_data["roads"])
         road_density = round(calculate_length_km(road_matches) / cell_area_km2, 4)
 
+        # Detect National Highway / State Highway
+        has_NH = False
+        has_SH = False
+
+        if not road_matches.empty:
+            name_col = next((c for c in ["name", "NAME"] if c in road_matches.columns), None)
+
+            if name_col:
+                for road_name in road_matches[name_col].dropna().astype(str):
+                    road_upper = road_name.upper().strip()
+
+                    if (
+                        "NATIONAL HIGHWAY" in road_upper or
+                        road_upper.startswith("NH") or
+                        " NH " in f" {road_upper} "
+                    ):
+                        has_NH = True
+
+                    if (
+                        "STATE HIGHWAY" in road_upper or
+                        road_upper.startswith("SH") or
+                        " SH " in f" {road_upper} "
+                    ):
+                        has_SH = True
+
         rail_matches = spatial_intersect(osm_data["railways"])
         railway_density = round(calculate_length_km(rail_matches) / cell_area_km2, 4)
 
@@ -393,6 +418,8 @@ def cell_landmark_mapper(
             "localities_villages": localities_villages,
             "road_ids": extract_line_ids(road_matches, "road_id"),
             "railway_ids": extract_line_ids(rail_matches, "railway_id"),
+            "has_NH": has_NH,
+            "has_SH": has_SH,
             "river_ids": extract_line_ids(river_matches, "river_id"),
             "powerline_ids": extract_line_ids(powerline_matches, "powerline_id"),
             "waterline_ids": extract_line_ids(waterline_matches, "waterline_id"),
@@ -415,7 +442,7 @@ def cell_landmark_mapper(
         (
             r["h3_index"], r["state_names"], r["district_names"], r["sub_districts"],
             r["cities_towns"], r["localities_villages"], r["road_ids"],
-            r["railway_ids"], r["river_ids"], r["powerline_ids"],
+            r["railway_ids"], bool(r["has_NH"]), bool(r["has_SH"]), r["river_ids"], r["powerline_ids"],
             r["waterline_ids"], r["telecom_ids"], r["oilline_ids"],
             r["is_farmland"], r["agricultural_centroids"], float(r["population_density"]),
             int(r["estimated_population"]), float(r["building_density"]),
@@ -428,18 +455,18 @@ def cell_landmark_mapper(
         INSERT INTO cell_landmark_mapping (
             h3_index, state_names, district_names, sub_districts,
             cities_towns, localities_villages, road_ids, railway_ids,
-            river_ids, powerline_ids, waterline_ids, telecom_ids,
+            has_NH, has_SH, river_ids, powerline_ids, waterline_ids, telecom_ids,
             oilline_ids, is_farmland, agricultural_centroids,
             population_density, estimated_population, building_density,
             road_density, railway_density, landmark_names
         )
         VALUES (
-            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14,
+            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16,
             CASE
-                WHEN $15::text IS NULL THEN NULL
-                ELSE ST_GeomFromText($15, 4326)
+                WHEN $17::text IS NULL THEN NULL
+                ELSE ST_GeomFromText($17, 4326)
             END,
-            $16, $17, $18, $19, $20, $21
+            $18, $19, $20, $21, $22, $23
         )
         ON CONFLICT (h3_index) DO UPDATE SET
             state_names = EXCLUDED.state_names,
@@ -449,6 +476,8 @@ def cell_landmark_mapper(
             localities_villages = EXCLUDED.localities_villages,
             road_ids = EXCLUDED.road_ids,
             railway_ids = EXCLUDED.railway_ids,
+            has_NH = EXCLUDED.has_NH,
+            has_SH = EXCLUDED.has_SH,
             river_ids = EXCLUDED.river_ids,
             powerline_ids = EXCLUDED.powerline_ids,
             waterline_ids = EXCLUDED.waterline_ids,

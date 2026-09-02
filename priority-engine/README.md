@@ -1,0 +1,3 @@
+## Priority engine  
+  
+**The priority engine is a risk assessment and resource prioritization system for landslide related action. It takes in all the probable landslide cells, confirmed landslide cells and projected landslide cells and calculate a priority score for each based on the risk posed to human life, infrastructure, connectivity, agriculture and other critical lifelines(powerlines,oillines,waterlines etc.). It also takes into consideration realtime traffic data at the region to further assess the human exposure to the landslide. Based on this , it helps disaster managment teams , public and field officers to take effective actions based on risk levels involved and optimizing their resource effectively.**

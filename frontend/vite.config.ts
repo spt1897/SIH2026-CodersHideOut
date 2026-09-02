@@ -7,4 +7,11 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  server: {
+    // Allows any tunnel host (recommended for active development)
+    allowedHosts: true,
+    
+    // Alternatively, strictly allow only today's specific URL:
+    // allowedHosts: ['chatty-knives-jump.loca.lt'],
+  }
 })

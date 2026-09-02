@@ -4,6 +4,8 @@ import LiveCapture from '../../components/common/LiveCapture';
 import FileUpload from '../../components/common/FileUpload'; // Import the new component
 import OfflineSyncWidget from '../../components/common/OfflineWidgetSync';
 import SyncHistoryLog from '../../components/common/SyncHistoryLog';
+import LiveFieldCapture from '../../components/common/LiveFieldCapture';
+import RecentUploads from '../../components/RecentUploads';
 
 export default function DashboardPage() {
   const { t } = useTranslation();
@@ -28,7 +30,7 @@ export default function DashboardPage() {
         {/* Left Side: Live Analysis */}
         <div className="flex flex-col items-center">
           <h2 className="text-xl font-bold text-slate-200 mb-4 w-full max-w-md">Live AI Analysis</h2>
-          <LiveCapture />
+          <LiveFieldCapture />
         </div>
 
         {/* Right Side: Static File Upload */}
@@ -38,7 +40,8 @@ export default function DashboardPage() {
         </div>
 
         <OfflineSyncWidget />
-        <SyncHistoryLog />
+        <RecentUploads/>
+
 
       </main>
 

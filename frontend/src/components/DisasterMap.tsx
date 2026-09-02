@@ -6,9 +6,69 @@ import { latLngToCell } from 'h3-js';
 import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 maplibregl.setWorkerUrl(maplibreWorkerUrl);
 
+// Update interface to accept mapMode from the parent dashboard
 interface DisasterMapProps {
   riskData?: any;
+  mapMode: 'monitoring' | 'planning';
 }
+
+// Dark Mode (Constant Monitoring)
+const MONITORING_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
+
+// Satellite Mode (Hybrid: Imagery + Roads + Labels)
+const PLANNING_STYLE: maplibregl.StyleSpecification = {
+  version: 8,
+  sources: {
+    // 1. The base satellite imagery
+    'esri-satellite': {
+      type: 'raster',
+      tiles: [
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+      ],
+      tileSize: 256,
+      attribution: 'Tiles &copy; Esri'
+    },
+    // 2. The transparent road network overlay
+    'esri-roads': {
+      type: 'raster',
+      tiles: [
+        'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}'
+      ],
+      tileSize: 256
+    },
+    // 3. The transparent city/street labels overlay
+    'esri-labels': {
+      type: 'raster',
+      tiles: [
+        'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}'
+      ],
+      tileSize: 256
+    }
+  },
+  layers: [
+    {
+      id: 'satellite-base',
+      type: 'raster',
+      source: 'esri-satellite',
+      minzoom: 0,
+      maxzoom: 22
+    },
+    {
+      id: 'roads-overlay',
+      type: 'raster',
+      source: 'esri-roads',
+      minzoom: 0,
+      maxzoom: 22
+    },
+    {
+      id: 'labels-overlay',
+      type: 'raster',
+      source: 'esri-labels',
+      minzoom: 0,
+      maxzoom: 22
+    }
+  ]
+};
 
 // Re-adds custom layers whenever the base style is swapped
 const addCustomLayers = (map: maplibregl.Map, data: any) => {
@@ -26,34 +86,31 @@ const addCustomLayers = (map: maplibregl.Map, data: any) => {
         'fill-color': [
           'step',
           ['get', 'score'],
-          '#22c55e', 20,
-          '#eab308', 45,
-          '#f97316', 70,
-          '#ef4444'
+          '#22c55e', 20, // Green for low risk
+          '#eab308', 45, // Yellow
+          '#f97316', 70, // Orange
+          '#ef4444'      // Red for critical
         ],
-        'fill-opacity': 0.4
+        'fill-opacity': 0.6 // Slightly higher opacity for visibility over satellite
       }
     });
   }
 };
 
-export default function DisasterMap({ riskData }: DisasterMapProps) {
+export default function DisasterMap({ riskData, mapMode }: DisasterMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
   const [selectedCell, setSelectedCell] = useState<any>(null);
-  const [currentTheme, setCurrentTheme] = useState<'dark' | 'light'>('dark');
-
-  const styleUrl = currentTheme === 'dark'
-    ? 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
-    : 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
 
   // 1. Initialize Map
   useEffect(() => {
     if (map.current || !mapContainer.current) return;
 
+    const initialStyle = mapMode === 'monitoring' ? MONITORING_STYLE : PLANNING_STYLE;
+
     const mapInstance = new maplibregl.Map({
       container: mapContainer.current,
-      style: styleUrl,
+      style: initialStyle,
       center: [91.89, 25.57],
       zoom: 12
     });
@@ -71,10 +128,10 @@ export default function DisasterMap({ riskData }: DisasterMapProps) {
         if (features && features.length > 0) {
           const clickedCell = features[0].properties;
           setSelectedCell({
-            h3Index: clickedCell.h3Index,
-            score: clickedCell.score,
-            state: clickedCell.state,
-            alert: clickedCell.alert
+            h3Index: clickedCell.h3Index || 'N/A',
+            score: clickedCell.score || 0,
+            state: clickedCell.state || 'Unknown',
+            alert: clickedCell.alert || 'None'
           });
         } else {
           const { lng, lat } = e.lngLat;
@@ -89,26 +146,31 @@ export default function DisasterMap({ riskData }: DisasterMapProps) {
       mapInstance.on('mouseleave', 'h3-cells-layer', () => {
         mapInstance.getCanvas().style.cursor = '';
       });
+      
       mapInstance.addControl(
         new maplibregl.GeolocateControl({
           positionOptions: { enableHighAccuracy: true },
           trackUserLocation: true
         }),
-        'top-right' // Position on the map canvas
+        'top-right'
       );
     });
-  }, []);
+  }, []); // Only runs on mount
 
-  // 2. Handle Base Style Switching
+  // 2. Handle Base Style Switching (Monitoring vs Planning)
   useEffect(() => {
-    if (map.current) {
-      map.current.setStyle(styleUrl);
+    if (!map.current) return;
 
-      map.current.once('styledata', () => {
-        addCustomLayers(map.current!, riskData);
-      });
-    }
-  }, [styleUrl]);
+    const targetStyle = mapMode === 'monitoring' ? MONITORING_STYLE : PLANNING_STYLE;
+    
+    // Update the base map tiles
+    map.current.setStyle(targetStyle);
+
+    // Re-inject H3 layers when the new style finishes loading
+    map.current.once('styledata', () => {
+      addCustomLayers(map.current!, riskData);
+    });
+  }, [mapMode]);
 
   // 3. Handle Live Data Updates
   useEffect(() => {
@@ -116,22 +178,16 @@ export default function DisasterMap({ riskData }: DisasterMapProps) {
       const source = map.current.getSource('h3-cells') as maplibregl.GeoJSONSource;
       if (source) {
         source.setData(riskData);
+      } else if (map.current.isStyleLoaded()) {
+        // Fallback if data arrives before source is added during style switch
+        addCustomLayers(map.current, riskData);
       }
     }
   }, [riskData]);
 
-
   return (
     <div className="relative w-full h-full md:rounded-lg overflow-hidden md:border border-[#262626]">
       <div ref={mapContainer} className="w-full h-full" />
-
-      {/* Floating Theme Toggle (Always Accessible) */}
-      <button
-        onClick={() => setCurrentTheme((prev) => (prev === 'dark' ? 'light' : 'dark'))}
-        className="absolute bottom-6 left-6 bg-[#171717] text-white px-3 py-1.5 text-xs font-semibold rounded shadow-md border border-[#3f3f46] z-10 hover:bg-[#262626] transition-colors"
-      >
-        Switch to {currentTheme === 'dark' ? 'Light' : 'Dark'} Map
-      </button>
 
       {/* Floating Cell Inspector */}
       {selectedCell && (

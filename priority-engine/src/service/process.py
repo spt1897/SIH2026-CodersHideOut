@@ -55,11 +55,12 @@ async def process(msg,app,service_name):
             cell_ids.append(data.pop("h3_index"))
             
 
-
+    cell_set = set(cell_ids)
     for cell in unique_radius_cells:
-        cell_ids.append(cell)
-        cell_types.append("radius_cells")
-        cell_probs.append(None)
+        if cell not in cell_set:
+            cell_ids.append(cell)
+            cell_types.append("radius_cells")
+            cell_probs.append(None)
 
     async def getcelldata(conn:asyncpg.Connection):
         return await conn.fetch("""SELECT

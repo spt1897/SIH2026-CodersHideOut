@@ -1,0 +1,116 @@
+# version: '3.8'
+
+services:
+
+  # 1. The Eureka Server
+  eureka-server:
+    build: ./backend/eurekaserver
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8761/actuator/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    # env_file: 
+    #   - ./backend/eurekaserver/.env
+  
+  #Redis Cache Service
+  redis-cache:
+    image: redis:7-alpine
+    container_name: redis-cache
+    ports:
+      - "6379:6379"
+
+  # 2. The API Gateway
+  api-gateway:
+    build: ./backend/apigateway
+    container_name: api-gateway
+    ports:
+      - "8181:8181"
+    depends_on:
+      eureka-server:
+        condition: service_started
+    env_file:                           
+      - ./backend/auth-service/.env
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SERVER_PORT=8181
+      - CLOUD_GATEWAY_DISCOVERY_LOCATOR_ENABLED=true
+  
+  # 3. The Auth Database
+  auth-db:
+    image: postgres:latest
+    container_name: auth-db
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: auth_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - auth_db_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-postgres} -d auth_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  user-db:
+    image: postgres:latest
+    container_name: user-db
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: user_db
+    ports:
+      - "5422:5432"
+    volumes:
+      - user_db_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-postgres} -d user_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 4. The Auth Microservice
+  auth-service:
+    build: ./backend/auth-service
+    container_name: auth-service
+    ports:
+      - "8090:8090"
+    depends_on:
+      auth-db:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+    env_file: 
+      - ./backend/auth-service/.env
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://auth-db:5432/auth_db
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME:-postgres}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD:-postgres}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SERVER_PORT=8090
+  
+  user-service:
+    build: ./backend/userservice
+    container_name: user-service
+    ports:
+      - "8070:8070"
+    depends_on:
+      user-db:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+    env_file: 
+      - ./backend/userservice/.env
+    environment:
+      - DB_URL=postgresql://${DB_USERNAME:-postgres}:${DB_PASSWORD:-postgres}@user-db:5432/user_db
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka
+      - SERVER_PORT=8070
+
+volumes:
+  auth_db_data:
+  user_db_data:

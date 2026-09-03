@@ -13,6 +13,7 @@ import asyncio
 from functools import partial
 import asyncpg
 from src.models.mapper import *
+from src.geo_features_processors.calc_friction import *
 
 extractor = APIRouter(prefix="/extract")
 
@@ -147,3 +148,8 @@ async def extract_geo_features(mapper: Mapper, req: Request):
  
 
     return {"data": res["records"]}
+
+@extractor.post("/calc-friction-coefficients")
+async def calc_friction_coefficients(req:Request):
+    await update_friction_coefficients(req.app)
+    return {"Status" : "successfully calculated friction coefficients"}

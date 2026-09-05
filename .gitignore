@@ -37,3 +37,5 @@ env/
 setenv.bat
 
 *.json
+
+__pycache__/

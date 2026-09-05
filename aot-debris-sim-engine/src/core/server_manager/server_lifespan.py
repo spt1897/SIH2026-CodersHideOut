@@ -7,6 +7,8 @@ from src.core.config import Config
 from src.core.server_manager.appstate import init_appstate
 from fastapi import FastAPI
 from typing import Callable
+from src.event.createconsumer import *
+from src.syncer.load_from_db import *
 import time
 '''
 This file manages the lifespan(initiialization and deinitialisation) of the server.
@@ -23,6 +25,8 @@ async def init_server(app: FastAPI,process_pool_init:Callable=None,args:tuple[()
     #initialise other app state variables
     await init_appstate(app,process_pool_init,args)
     #register to eureka now
+    await load_from_db(app)
+    await createconsumer(app)
     await register_service(app)
    
 

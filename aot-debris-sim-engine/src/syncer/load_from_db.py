@@ -21,3 +21,8 @@ async def load_from_db(app):
                     row = dict(row)
                     h3_id = row.pop("h3_index")
                     pipe.hset(f"cell_sim_nodes:{h3_id}", mapping = row)
+            await query_redis(sync_to_redis,app)
+            total_fetched+=len(rows)
+
+    await query_db(get_from_db,app)
+        

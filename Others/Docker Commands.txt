@@ -1,6 +1,0 @@
-docker info
-docker compose up -d --build
-docker compose logs -f api-gateway
-docker compose down
-docker exec -it redis-cache redis-cli
-SET apikey:alpha-squad-77 1

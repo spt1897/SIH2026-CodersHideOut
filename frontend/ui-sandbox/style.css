@@ -2,6 +2,60 @@
    DESIGN TOKENS
    ============================================================ */
 
+/* 
+  Landslide Map UI Background 
+  A modern, dark-themed dashboard background featuring an active radar/topographical glow effect.
+*/
+
+:root {
+  --bg-dark: #0f141c;
+  --grid-color: rgba(30, 41, 59, 0.5);
+  --hazard-glow: rgba(239, 68, 68, 0.15); /* Red warning glow for landslide zones */
+  --topo-line: rgba(51, 65, 85, 0.3);
+}
+
+/* Topographical / Hazard Hotspot Glows */
+body::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 30% 40%, var(--hazard-glow) 0%, transparent 40%),
+    radial-gradient(circle at 70% 60%, rgba(245, 158, 11, 0.1) 0%, transparent 50%), /* Moderate risk zone */
+    radial-gradient(circle at 50% 30%, rgba(16, 185, 129, 0.05) 0%, transparent 30%); /* Low risk zone */
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Simulated Radar / Scanning Line Effect */
+.radar-scan {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(239, 68, 68, 0.03) 50%,
+    rgba(239, 68, 68, 0.1) 99%,
+    rgba(239, 68, 68, 0.3) 100%
+  );
+  background-size: 100% 200%;
+  animation: scan 6s linear infinite;
+  z-index: 3;
+  pointer-events: none;
+}
+
+@keyframes scan {
+  0% { background-position: 0% -200%; }
+  100% { background-position: 0% 0%; }
+}
+
+
 :root {
 
   /* Dark theme */
@@ -123,11 +177,20 @@ body {
 
   color: var(--text-primary);
 
-  background: var(--bg-indigo);
+  /* Background image (landslide/topographical map) with a
+     solid-color fallback in case the image fails to load. */
+  background-color: var(--bg-indigo);
+  background-image: url('landslidebg.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 
   -webkit-font-smoothing: antialiased;
 
   overflow-x: hidden;
+
+  position: relative;
 
   transition:
     background-color 0.35s ease,
@@ -208,6 +271,8 @@ p {
       var(--bg-indigo) 0%,
       var(--bg-teal) 100%
     );
+
+  opacity: 0.55;
 
   overflow: hidden;
 

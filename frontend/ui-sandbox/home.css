@@ -1,9 +1,8 @@
 /* ============================================================
    HOMEPAGE TOKENS
-   No new hues added — the hero glow, CTAs, and icons all reuse
-   the --accent / --periwinkle values already defined in
-   style.css, so the homepage stays on the exact palette as the
-   rest of the site (auth page included).
+   Uses the exact design tokens defined in style.css:
+   dark/light backgrounds, surface blocks, text hierarchy,
+   borders, accents, typography, spacing, radii and shadows.
    ============================================================ */
 
 :root {
@@ -14,12 +13,86 @@
 
 body.home {
   overflow-x: hidden;
+
+  /* Homepage readability boost: keep the same style.css palette,
+     but use stronger secondary text for better contrast. */
+  --text-muted: #CBD5E1;
+  --text-faint: #94A3B8;
+}
+
+:root[data-theme="light"] body.home {
+  --text-muted: #334155;
+  --text-faint: #475569;
+}
+
+/* Slightly larger secondary copy improves readability without
+   changing the layout or typography hierarchy. */
+.home .section-sub,
+.home .hero__subtitle,
+.home .room-card p,
+.home .stat__label,
+.home .about__text p,
+.home .about__stat-label,
+.home .changelog__list p,
+.home .faq-item p,
+.home .simple-form .field label,
+.home .site-footer__links a {
+  font-size: max(var(--fs-small), 0.84rem);
+}
+
+.home .hero__subtitle,
+.home .about__text p {
+  font-weight: 450;
 }
 
 .home main {
   position: relative;
   z-index: 1;
 }
+
+/* Keep homepage text and blocks on the same theme tokens as style.css. */
+body.home {
+  color: var(--text-primary);
+  background-color: var(--bg-indigo);
+}
+
+.home .room-card,
+.home .stats__grid,
+.home .quote-card,
+.home .changelog__list li,
+.home .about__stats,
+.home .team-card,
+.home .faq-item {
+  color: var(--text-primary);
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+.home .room-card:hover,
+.home .team-card:hover,
+.home .faq-item[open] {
+  background: var(--surface-strong);
+  border-color: var(--border-strong);
+}
+
+.home .section-sub,
+.home .hero__subtitle,
+.home .room-card p,
+.home .stat__label,
+.home .about__text p,
+.home .about__stat-label,
+.home .changelog__list p,
+.home .site-footer__links a {
+  color: var(--text-muted);
+}
+
+.home .hero__note,
+.home .window__bar-label,
+.home .quote-card footer,
+.home .site-footer__copy {
+  color: var(--text-faint);
+}
+
 
 
 /* ============================================================

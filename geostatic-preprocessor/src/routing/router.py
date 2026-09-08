@@ -14,7 +14,9 @@ from functools import partial
 import asyncpg
 from src.models.mapper import *
 from src.geo_features_processors.calc_friction import *
+import time
 
+BATCH_SIZE = 1
 extractor = APIRouter(prefix="/extract")
 
 @extractor.post("/static-features/")
@@ -120,15 +122,23 @@ async def extract_static_feature(region : Region, req : Request):
         case _:
             return {"Status": f"Unknown feature: '{region.feature}'"}
 
+    h3_indexes = [row[0] for row in tuple_data]
+    print(len(set(h3_indexes)))
     async def db_upsert(conn: asyncpg.Connection) -> int:
         if not tuple_data:
             return 0
-        await conn.executemany(query, tuple_data)
+        for i in range(0, len(tuple_data), BATCH_SIZE): 
+            batch=tuple_data[i:i + BATCH_SIZE]
+            await conn.executemany(query, batch)
+            print(
+            f"[DB] Completed "
+            f"{i + len(batch)}/{len(tuple_data)}"
+            )
         return len(tuple_data)
 
     await query_db(query_func=db_upsert,app=req.app)
     return {"data" : tuple_data}
-    return {"Status": f"{region.feature} extracted and upserted to Database for Region: {region.bbox} successfully."}
+    #return {"Status": f"{region.feature} extracted and upserted to Database for Region: {region.bbox} successfully."}
 
 
 
@@ -139,17 +149,56 @@ async def extract_geo_features(mapper: Mapper, req: Request):
 
     if mapper.feature == "emergency":
         res = await loop.run_in_executor(pool,extract_emergency_nodes,mapper.bbox,mapper.h3_res)
+        print(len(res["values"]))
+        async def db_upsert(conn: asyncpg.Connection) -> int:
+            if not res["values"]:
+                return 0
+            tuple_data = res["values"]
+            for i in range(0, len(tuple_data), BATCH_SIZE): 
+                batch = tuple_data[i:i+BATCH_SIZE]
+                await conn.executemany(res["query"], batch)
+                print(
+                            f"[DB] Completed "
+                            f"{i + len(batch)}/{len(tuple_data)}"
+                            )
+        await query_db(db_upsert,req.app)
+        return res["records"]
 
     elif mapper.feature == "cell_landmarks":
         res = await loop.run_in_executor(pool,cell_landmark_mapper,mapper.bbox,mapper.h3_res)
+        async def db_upsert(conn: asyncpg.Connection) -> int:
+            if not res["values"]:
+                return 0
+            tuple_data = res["values"]
+            for i in range(0, len(tuple_data), BATCH_SIZE): 
+                batch = tuple_data[i:i+BATCH_SIZE]
+                await conn.executemany(res["query"], batch)
+                print(  f"[DB] Completed "f"{i + len(batch)}/{len(tuple_data)}")
+  
+        await query_db(db_upsert,req.app)
+        return res["records"]
     
     elif mapper.feature == "infrastructure":
         res = await loop.run_in_executor(pool,fetch_infrastructure_by_bbox,mapper.bbox,mapper.h3_res)
- 
+        for infra in ["roads", "railways", "rivers", "powerlines", "waterlines", "telecom", "oillines"]:
+            if infra not in res:    continue
+            async def db_upsert(conn: asyncpg.Connection) -> int:
+                if not res[infra]["values"]:
+                    return 0
+                tuple_data = res[infra]["values"]
+                for i in range(0, len(tuple_data), BATCH_SIZE): 
+                    batch = tuple_data[i:i+BATCH_SIZE]
+                    await conn.executemany(res[infra]["query"], batch)
+                    print(  f"[DB] {infra} Completed "f"{i + len(batch)}/{len(tuple_data)}")
+        
+            await query_db(db_upsert,req.app)
 
-    return {"data": res["records"]}
+        return res
+
+
 
 @extractor.post("/calc-friction-coefficients")
 async def calc_friction_coefficients(req:Request):
     await update_friction_coefficients(req.app)
     return {"Status" : "successfully calculated friction coefficients"}
+

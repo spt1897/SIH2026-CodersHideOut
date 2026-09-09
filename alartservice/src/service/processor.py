@@ -73,12 +73,20 @@ async def evaluate_batch(msg_batch: list, redis_client: redis.Redis, groupname: 
                             alert_color=color
                         )
                         
-                        await redis_client.xadd("dashboard_alerts_stream", {
+                        await redis_client.xadd("processed_alert_stream", {
                             "cell_id": alert.cell_id,
                             "type": alert.cell_type,
+                            "raw_priority": str(alert.raw_priority),
                             "priority_score": str(alert.actual_score),
                             "color": alert.alert_color
                         })
+
+                        # await redis_client.xadd("dashboard_alerts_stream", {
+                        #     "cell_id": alert.cell_id,
+                        #     "type": alert.cell_type,
+                        #     "priority_score": str(alert.actual_score),
+                        #     "color": alert.alert_color
+                        # })
                         
                         await trigger_dispatch_if_needed(alert, redis_client,app)
 
